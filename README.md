@@ -58,3 +58,5 @@ private class EventListener implements IEventListener {
 	}
 }
 ```
+
+Nota Bene: The volume result is an object that gather the global sample sound volume but also the left channel volume and the right channel volume in order to modify the stereo of the signal.
