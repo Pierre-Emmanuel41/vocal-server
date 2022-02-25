@@ -1,13 +1,14 @@
 package fr.pederobien.vocal.server.event;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import fr.pederobien.vocal.common.impl.VolumeResult;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
+import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
 public class PlayerSpeakEvent extends ProjectVocalServerEvent {
+	private IVocalServer server;
 	private IVocalPlayer transmitter;
 	private Map<String, IVocalPlayer> players;
 	private Map<IVocalPlayer, VolumeResult> volumes;
@@ -19,19 +20,26 @@ public class PlayerSpeakEvent extends ProjectVocalServerEvent {
 	 * - Removing the player from the {@link #getVolumes()} map.</br>
 	 * - Setting the associated {@link VolumeResult} to {@link VolumeResult#NONE}.</br>
 	 * 
-	 * @param players     The list of players registered on the server.
+	 * @param server      The server involved in this event.
 	 * @param transmitter The speaking player.
 	 * @param data        The bytes array that represents an audio sample.
 	 */
-	public PlayerSpeakEvent(List<IVocalPlayer> players, IVocalPlayer transmitter, byte[] data) {
+	public PlayerSpeakEvent(IVocalServer server, IVocalPlayer transmitter, byte[] data) {
 		this.transmitter = transmitter;
 		this.data = data;
 
 		this.players = new HashMap<String, IVocalPlayer>();
 		volumes = new HashMap<IVocalPlayer, VolumeResult>();
 
-		for (IVocalPlayer player : players)
+		for (IVocalPlayer player : server.getPlayers().list())
 			this.players.put(player.getName(), player);
+	}
+
+	/**
+	 * @return The server involved in this event.
+	 */
+	public IVocalServer getServer() {
+		return server;
 	}
 
 	/**

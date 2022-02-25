@@ -85,7 +85,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 		IVocalPlayer player = optPlayer.isPresent() ? optPlayer.get() : getPlayers().add(playerSpeakMessage.getPlayerName(), event.getAddress());
 
 		// Dispatching the player speak event in order to specify to which person the transmitter speak
-		PlayerSpeakEvent playerSpeakEvent = new PlayerSpeakEvent(players.list(), player, playerSpeakMessage.getData());
+		PlayerSpeakEvent playerSpeakEvent = new PlayerSpeakEvent(this, player, playerSpeakMessage.getData());
 		EventManager.callEvent(playerSpeakEvent);
 
 		// Sending the audio sample to the concerned players.
