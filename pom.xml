@@ -19,7 +19,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>fr.pederobien</groupId>
-			<artifactId>utils</artifactId>
+			<artifactId>vocal-common</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
