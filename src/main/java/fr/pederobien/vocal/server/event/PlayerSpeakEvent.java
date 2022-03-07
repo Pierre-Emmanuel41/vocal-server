@@ -2,6 +2,7 @@ package fr.pederobien.vocal.server.event;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringJoiner;
 
 import fr.pederobien.vocal.common.impl.VolumeResult;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
@@ -25,6 +26,7 @@ public class PlayerSpeakEvent extends ProjectVocalServerEvent {
 	 * @param data        The bytes array that represents an audio sample.
 	 */
 	public PlayerSpeakEvent(IVocalServer server, IVocalPlayer transmitter, byte[] data) {
+		this.server = server;
 		this.transmitter = transmitter;
 		this.data = data;
 
@@ -68,5 +70,17 @@ public class PlayerSpeakEvent extends ProjectVocalServerEvent {
 	 */
 	public byte[] getData() {
 		return data;
+	}
+
+	@Override
+	public String toString() {
+		StringJoiner joiner = new StringJoiner(", ", "{", "}");
+		joiner.add("Transmitter=" + getTransmitter().getName());
+		StringJoiner receivers = new StringJoiner(", ", "{", "}");
+		String format = "name=%s, volume={global=%s, left=%s, right=%s}";
+		for (Map.Entry<IVocalPlayer, VolumeResult> entry : getVolumes().entrySet())
+			receivers.add(String.format(format, entry.getKey().getName(), entry.getValue().getGlobal(), entry.getValue().getLeft(), entry.getValue().getRight()));
+		joiner.add("Receivers=" + receivers);
+		return String.format("%s_%s", getName(), joiner);
 	}
 }
