@@ -8,8 +8,7 @@ import fr.pederobien.communication.impl.UdpServer;
 import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.utils.event.IEventListener;
-import fr.pederobien.vocal.common.impl.Idc;
-import fr.pederobien.vocal.common.impl.Oid;
+import fr.pederobien.vocal.common.impl.VocalIdentifier;
 import fr.pederobien.vocal.common.impl.VocalMessageExtractor;
 import fr.pederobien.vocal.common.impl.VocalMessageFactory;
 import fr.pederobien.vocal.common.impl.VolumeResult;
@@ -76,7 +75,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 
 		// Verification of the structure of the bytes array.
 		IVocalMessage message = factory.parse(event.getBuffer());
-		if (message.getHeader().getIdc() != Idc.PLAYER_SPEAK || message.getHeader().getOid() != Oid.INFO)
+		if (message.getHeader().getIdentifier() != VocalIdentifier.PLAYER_SPEAK_INFO)
 			return;
 
 		// Checking if the player is know by the server.
@@ -97,8 +96,8 @@ public class VocalServer implements IVocalServer, IEventListener {
 			if (volume.getGlobal() < EPSILON)
 				return;
 
-			IVocalMessage response = factory.create(Idc.PLAYER_SPEAK, Oid.SET, transmitter, data, volume);
-			udpServer.getConnection().send(new AddressMessage(response.generate(), response.getHeader().getIdentifier(), p.getAddress()));
+			IVocalMessage response = factory.create(VocalIdentifier.PLAYER_SPEAK_SET, transmitter, data, volume);
+			udpServer.getConnection().send(new AddressMessage(response.generate(), response.getHeader().getSequence(), p.getAddress()));
 		});
 	}
 }
