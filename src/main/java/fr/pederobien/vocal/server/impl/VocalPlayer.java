@@ -15,13 +15,15 @@ import fr.pederobien.vocal.server.event.PlayerMuteChangePostEvent;
 import fr.pederobien.vocal.server.event.PlayerMuteChangePreEvent;
 import fr.pederobien.vocal.server.event.PlayerNameChangePostEvent;
 import fr.pederobien.vocal.server.event.PlayerNameChangePreEvent;
+import fr.pederobien.vocal.server.event.PlayerOnlineChangePostEvent;
+import fr.pederobien.vocal.server.event.PlayerOnlineChangePreEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
 public class VocalPlayer implements IVocalPlayer {
 	private IVocalServer server;
 	private String name;
-	private boolean isMute, isDeafen;
+	private boolean isOnline, isMute, isDeafen;
 	private Map<IVocalPlayer, Boolean> isMuteBy;
 	private InetSocketAddress address;
 	private Lock lock;
@@ -29,9 +31,11 @@ public class VocalPlayer implements IVocalPlayer {
 	/**
 	 * Creates a vocal player based on the following parameters.
 	 * 
-	 * @param server  The server on which this player is registered.
-	 * @param name    The name of this player.
-	 * @param address The address of this player.
+	 * @param server   The server on which this player is registered.
+	 * @param name     The name of this player.
+	 * @param address  The address of this player.
+	 * @param isMute   True if the player is mute, false otherwise.
+	 * @param isDeafen True if the player is deafen, false otherwise.
 	 */
 	public VocalPlayer(IVocalServer server, String name, InetSocketAddress address, boolean isMute, boolean isDeafen) {
 		this.name = name;
@@ -62,6 +66,25 @@ public class VocalPlayer implements IVocalPlayer {
 
 			String oldName = this.name;
 			EventManager.callEvent(new PlayerNameChangePreEvent(this, name), () -> this.name = name, new PlayerNameChangePostEvent(this, oldName));
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public boolean isOnline() {
+		return isOnline;
+	}
+
+	@Override
+	public void setOnline(boolean isOnline) {
+		lock.lock();
+		try {
+			if (this.isOnline == isOnline)
+				return;
+
+			boolean oldOnline = this.isOnline;
+			EventManager.callEvent(new PlayerOnlineChangePreEvent(this, isOnline), () -> this.isOnline = isOnline, new PlayerOnlineChangePostEvent(this, oldOnline));
 		} finally {
 			lock.unlock();
 		}
