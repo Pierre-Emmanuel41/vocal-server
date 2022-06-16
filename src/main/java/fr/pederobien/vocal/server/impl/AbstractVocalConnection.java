@@ -11,6 +11,7 @@ import fr.pederobien.communication.event.UnexpectedDataReceivedEvent;
 import fr.pederobien.communication.interfaces.ITcpConnection;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.utils.event.LogEvent;
+import fr.pederobien.vocal.common.impl.VocalCallbackMessage;
 import fr.pederobien.vocal.common.impl.messages.v10.GetCommunicationProtocolVersionsV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetCommunicationProtocolVersionV10;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
