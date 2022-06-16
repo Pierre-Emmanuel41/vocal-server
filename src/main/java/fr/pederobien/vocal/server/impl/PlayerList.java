@@ -18,9 +18,10 @@ import fr.pederobien.vocal.server.event.VocalPlayerListPlayerAddPostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerListPlayerRemovePostEvent;
 import fr.pederobien.vocal.server.interfaces.IPlayerList;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
+import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
 public class PlayerList implements IPlayerList {
-	private String name;
+	private IVocalServer server;
 	private Map<String, IVocalPlayer> players;
 	private Lock lock;
 
@@ -29,8 +30,8 @@ public class PlayerList implements IPlayerList {
 	 * 
 	 * @param name The list name.
 	 */
-	protected PlayerList(String name) {
-		this.name = name;
+	protected PlayerList(IVocalServer server) {
+		this.server = server;
 
 		players = new HashMap<String, IVocalPlayer>();
 		lock = new ReentrantLock(true);
@@ -43,7 +44,7 @@ public class PlayerList implements IPlayerList {
 
 	@Override
 	public String getName() {
-		return name;
+		return server.getName();
 	}
 
 	@Override
@@ -110,7 +111,7 @@ public class PlayerList implements IPlayerList {
 			if (player != null)
 				throw new PlayerAlreadyRegisteredException(player, getName());
 
-			player = new VocalPlayer(name, address);
+			player = new VocalPlayer(server, name, address, false, false);
 			players.put(player.getName(), player);
 			return player;
 		} finally {

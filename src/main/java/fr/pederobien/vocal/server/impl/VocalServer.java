@@ -30,13 +30,13 @@ public class VocalServer implements IVocalServer, IEventListener {
 	 * Creates a server for vocal communication between several players.
 	 * 
 	 * @param name The server name.
-	 * @param port The server port number for the UDP communication.
+	 * @param port The server port number for the UDP and TCP communication.
 	 */
 	public VocalServer(String name, int port) {
 		this.name = name;
 		this.port = port;
 
-		players = new PlayerList(name);
+		players = new PlayerList(this);
 		udpServer = new UdpServer(getName(), getPort(), () -> new VocalMessageExtractor());
 		factory = VocalMessageFactory.getInstance(10000);
 
