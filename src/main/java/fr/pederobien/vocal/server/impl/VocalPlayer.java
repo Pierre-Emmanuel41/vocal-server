@@ -7,6 +7,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import fr.pederobien.utils.event.EventManager;
+import fr.pederobien.vocal.server.event.PlayerDeafenChangePostEvent;
+import fr.pederobien.vocal.server.event.PlayerDeafenChangePreEvent;
 import fr.pederobien.vocal.server.event.PlayerMuteByChangePostEvent;
 import fr.pederobien.vocal.server.event.PlayerMuteByChangePreEvent;
 import fr.pederobien.vocal.server.event.PlayerMuteChangePostEvent;
@@ -115,6 +117,9 @@ public class VocalPlayer implements IVocalPlayer {
 		try {
 			if (this.isDeafen == isDeafen)
 				return;
+
+			boolean oldDeafen = this.isDeafen;
+			EventManager.callEvent(new PlayerDeafenChangePreEvent(this, isDeafen), () -> this.isDeafen = isDeafen, new PlayerDeafenChangePostEvent(this, oldDeafen));
 		} finally {
 			lock.unlock();
 		}
