@@ -5,7 +5,7 @@ import java.util.StringJoiner;
 import fr.pederobien.utils.ICancellable;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerMuteChangePreEvent extends PlayerEvent implements ICancellable {
+public class VocalPlayerMuteChangePreEvent extends VocalPlayerEvent implements ICancellable {
 	private boolean isCancelled;
 	private boolean newMute;
 
@@ -15,7 +15,7 @@ public class PlayerMuteChangePreEvent extends PlayerEvent implements ICancellabl
 	 * @param player  The player whose the mute status is about to change.
 	 * @param newMute The new player's mute status.
 	 */
-	public PlayerMuteChangePreEvent(IVocalPlayer player, boolean newMute) {
+	public VocalPlayerMuteChangePreEvent(IVocalPlayer player, boolean newMute) {
 		super(player);
 		this.newMute = newMute;
 	}

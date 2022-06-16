@@ -5,7 +5,7 @@ import java.util.StringJoiner;
 import fr.pederobien.utils.ICancellable;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerDeafenChangePreEvent extends PlayerEvent implements ICancellable {
+public class VocalPlayerDeafenChangePreEvent extends VocalPlayerEvent implements ICancellable {
 	private boolean isCancelled;
 	private boolean newDeafen;
 
@@ -15,7 +15,7 @@ public class PlayerDeafenChangePreEvent extends PlayerEvent implements ICancella
 	 * @param player    The player whose the deafen status is about to change.
 	 * @param newDeafen The new player's deafen status.
 	 */
-	public PlayerDeafenChangePreEvent(IVocalPlayer player, boolean newDeafen) {
+	public VocalPlayerDeafenChangePreEvent(IVocalPlayer player, boolean newDeafen) {
 		super(player);
 		this.newDeafen = newDeafen;
 	}

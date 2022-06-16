@@ -16,11 +16,11 @@ import java.util.stream.Stream;
 import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.utils.event.IEventListener;
-import fr.pederobien.vocal.server.event.PlayerNameChangePostEvent;
-import fr.pederobien.vocal.server.event.ServerPlayerAddPostEvent;
-import fr.pederobien.vocal.server.event.ServerPlayerAddPreEvent;
-import fr.pederobien.vocal.server.event.ServerPlayerRemovePostEvent;
-import fr.pederobien.vocal.server.event.ServerPlayerRemovePreEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerNameChangePostEvent;
+import fr.pederobien.vocal.server.event.VocalServerPlayerAddPostEvent;
+import fr.pederobien.vocal.server.event.VocalServerPlayerAddPreEvent;
+import fr.pederobien.vocal.server.event.VocalServerPlayerRemovePostEvent;
+import fr.pederobien.vocal.server.event.VocalServerPlayerRemovePreEvent;
 import fr.pederobien.vocal.server.exceptions.ServerPlayerListPlayerAlreadyRegisteredException;
 import fr.pederobien.vocal.server.interfaces.IServerPlayerList;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
@@ -67,7 +67,7 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 			throw new ServerPlayerListPlayerAlreadyRegisteredException(server.getPlayers(), optPlayer.get());
 
 		IVocalPlayer player = new VocalPlayer(getServer(), name, address, isMute, isDeafen);
-		ServerPlayerAddPreEvent preEvent = new ServerPlayerAddPreEvent(this, player);
+		VocalServerPlayerAddPreEvent preEvent = new VocalServerPlayerAddPreEvent(this, player);
 		EventManager.callEvent(preEvent, () -> addPlayer(player));
 		return preEvent.isCancelled() ? null : player;
 	}
@@ -78,7 +78,7 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 		if (!optPlayer.isPresent())
 			return null;
 
-		ServerPlayerRemovePreEvent preEvent = new ServerPlayerRemovePreEvent(this, optPlayer.get());
+		VocalServerPlayerRemovePreEvent preEvent = new VocalServerPlayerRemovePreEvent(this, optPlayer.get());
 		EventManager.callEvent(preEvent, () -> removePlayer(name));
 		return preEvent.isCancelled() ? null : optPlayer.get();
 	}
@@ -94,7 +94,7 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 		try {
 			Set<String> names = new HashSet<String>(players.keySet());
 			for (String name : names)
-				EventManager.callEvent(new ServerPlayerRemovePostEvent(this, players.remove(name)));
+				EventManager.callEvent(new VocalServerPlayerRemovePostEvent(this, players.remove(name)));
 		} finally {
 			lock.unlock();
 		}
@@ -116,7 +116,7 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 	}
 
 	@EventHandler
-	private void onPlayerNameChange(PlayerNameChangePostEvent event) {
+	private void onPlayerNameChange(VocalPlayerNameChangePostEvent event) {
 		Optional<IVocalPlayer> optOldPlayer = get(event.getOldName());
 		if (!optOldPlayer.isPresent())
 			return;
@@ -147,7 +147,7 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 			lock.unlock();
 		}
 
-		EventManager.callEvent(new ServerPlayerAddPostEvent(this, player));
+		EventManager.callEvent(new VocalServerPlayerAddPostEvent(this, player));
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 		}
 
 		if (player != null)
-			EventManager.callEvent(new ServerPlayerRemovePostEvent(this, player));
+			EventManager.callEvent(new VocalServerPlayerRemovePostEvent(this, player));
 
 		return player;
 	}

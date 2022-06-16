@@ -2,7 +2,7 @@ package fr.pederobien.vocal.server.event;
 
 import fr.pederobien.vocal.server.interfaces.IServerPlayerList;
 
-public class ServerPlayerListEvent extends ProjectVocalServerEvent {
+public class VocalServerPlayerListEvent extends ProjectVocalServerEvent {
 	private IServerPlayerList list;
 
 	/**
@@ -10,7 +10,7 @@ public class ServerPlayerListEvent extends ProjectVocalServerEvent {
 	 * 
 	 * @param list The list source involved in this event.
 	 */
-	public ServerPlayerListEvent(IServerPlayerList list) {
+	public VocalServerPlayerListEvent(IServerPlayerList list) {
 		this.list = list;
 	}
 

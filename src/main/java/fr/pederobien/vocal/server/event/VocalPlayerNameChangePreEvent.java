@@ -5,7 +5,7 @@ import java.util.StringJoiner;
 import fr.pederobien.utils.ICancellable;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerNameChangePreEvent extends PlayerEvent implements ICancellable {
+public class VocalPlayerNameChangePreEvent extends VocalPlayerEvent implements ICancellable {
 	private boolean isCancelled;
 	private String newName;
 
@@ -15,7 +15,7 @@ public class PlayerNameChangePreEvent extends PlayerEvent implements ICancellabl
 	 * @param player  The player whose the name is about to change.
 	 * @param newName The new player name.
 	 */
-	public PlayerNameChangePreEvent(IVocalPlayer player, String newName) {
+	public VocalPlayerNameChangePreEvent(IVocalPlayer player, String newName) {
 		super(player);
 		this.newName = newName;
 	}

@@ -4,7 +4,7 @@ import java.util.StringJoiner;
 
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerDeafenChangePostEvent extends PlayerEvent {
+public class VocalPlayerDeafenChangePostEvent extends VocalPlayerEvent {
 	private boolean oldDeafen;
 
 	/**
@@ -13,7 +13,7 @@ public class PlayerDeafenChangePostEvent extends PlayerEvent {
 	 * @param player    The player whose the deafen status has changed.
 	 * @param oldDeafen The old player's deafen status.
 	 */
-	public PlayerDeafenChangePostEvent(IVocalPlayer player, boolean oldDeafen) {
+	public VocalPlayerDeafenChangePostEvent(IVocalPlayer player, boolean oldDeafen) {
 		super(player);
 		this.oldDeafen = oldDeafen;
 	}

@@ -4,7 +4,7 @@ import java.util.StringJoiner;
 
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerNameChangePostEvent extends PlayerEvent {
+public class VocalPlayerNameChangePostEvent extends VocalPlayerEvent {
 	private String oldName;
 
 	/**
@@ -13,7 +13,7 @@ public class PlayerNameChangePostEvent extends PlayerEvent {
 	 * @param player  The player whose the name is about to change.
 	 * @param oldName The new player name.
 	 */
-	public PlayerNameChangePostEvent(IVocalPlayer player, String oldName) {
+	public VocalPlayerNameChangePostEvent(IVocalPlayer player, String oldName) {
 		super(player);
 		this.oldName = oldName;
 	}

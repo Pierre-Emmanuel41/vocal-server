@@ -4,7 +4,7 @@ import java.util.StringJoiner;
 
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerMuteByChangePostEvent extends PlayerEvent {
+public class VocalPlayerMuteByChangePostEvent extends VocalPlayerEvent {
 	private IVocalPlayer source;
 	private boolean oldMute;
 
@@ -15,7 +15,7 @@ public class PlayerMuteByChangePostEvent extends PlayerEvent {
 	 * @param source  The source player for which the target player is mute or unmute.
 	 * @param oldMute The old target player mute status for the source player.
 	 */
-	public PlayerMuteByChangePostEvent(IVocalPlayer target, IVocalPlayer source, boolean oldMute) {
+	public VocalPlayerMuteByChangePostEvent(IVocalPlayer target, IVocalPlayer source, boolean oldMute) {
 		super(target);
 		this.source = source;
 		this.oldMute = oldMute;

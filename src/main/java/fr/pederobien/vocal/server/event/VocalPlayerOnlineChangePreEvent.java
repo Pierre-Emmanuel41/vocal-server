@@ -5,7 +5,7 @@ import java.util.StringJoiner;
 import fr.pederobien.utils.ICancellable;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerOnlineChangePreEvent extends PlayerEvent implements ICancellable {
+public class VocalPlayerOnlineChangePreEvent extends VocalPlayerEvent implements ICancellable {
 	private boolean isCancelled, newOnline;
 
 	/**
@@ -14,7 +14,7 @@ public class PlayerOnlineChangePreEvent extends PlayerEvent implements ICancella
 	 * @param player    The player whose the online status is about to change.
 	 * @param newOnline The new player's online status.
 	 */
-	public PlayerOnlineChangePreEvent(IVocalPlayer player, boolean newOnline) {
+	public VocalPlayerOnlineChangePreEvent(IVocalPlayer player, boolean newOnline) {
 		super(player);
 		this.newOnline = newOnline;
 	}

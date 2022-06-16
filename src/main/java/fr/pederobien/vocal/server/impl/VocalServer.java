@@ -14,7 +14,7 @@ import fr.pederobien.vocal.common.impl.VocalMessageFactory;
 import fr.pederobien.vocal.common.impl.VolumeResult;
 import fr.pederobien.vocal.common.impl.messages.v10.PlayerSpeakInfoMessageV10;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
-import fr.pederobien.vocal.server.event.PlayerSpeakEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerSpeakEvent;
 import fr.pederobien.vocal.server.interfaces.IServerPlayerList;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
@@ -89,20 +89,20 @@ public class VocalServer implements IVocalServer, IEventListener {
 		IVocalPlayer player = optPlayer.get();
 
 		// Dispatching the player speak event in order to specify to which person the transmitter speak
-		PlayerSpeakEvent playerSpeakEvent = new PlayerSpeakEvent(this, player, playerSpeakMessage.getData());
-		EventManager.callEvent(playerSpeakEvent);
+		VocalPlayerSpeakEvent vocalPlayerSpeakEvent = new VocalPlayerSpeakEvent(this, player, playerSpeakMessage.getData());
+		EventManager.callEvent(vocalPlayerSpeakEvent);
 
 		// Sending the audio sample to the concerned players.
-		IVocalPlayer transmitter = playerSpeakEvent.getTransmitter();
-		byte[] data = playerSpeakEvent.getData();
-		playerSpeakEvent.getVolumes().keySet().parallelStream().forEach(receiver -> {
+		IVocalPlayer transmitter = vocalPlayerSpeakEvent.getTransmitter();
+		byte[] data = vocalPlayerSpeakEvent.getData();
+		vocalPlayerSpeakEvent.getVolumes().keySet().parallelStream().forEach(receiver -> {
 
 			// Checking if the receiver can accept audio sample from the transmitter
 			if (!receiver.isOnline() || receiver.isDeafen() || transmitter.isMuteBy(receiver))
 				return;
 
 			// Checking volume before sending.
-			VolumeResult volume = playerSpeakEvent.getVolumes().get(receiver);
+			VolumeResult volume = vocalPlayerSpeakEvent.getVolumes().get(receiver);
 			if (volume == null || volume.getGlobal() < EPSILON)
 				return;
 

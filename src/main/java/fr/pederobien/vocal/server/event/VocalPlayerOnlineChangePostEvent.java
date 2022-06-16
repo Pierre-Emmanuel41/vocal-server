@@ -4,7 +4,7 @@ import java.util.StringJoiner;
 
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerOnlineChangePostEvent extends PlayerEvent {
+public class VocalPlayerOnlineChangePostEvent extends VocalPlayerEvent {
 	private boolean oldOnline;
 
 	/**
@@ -13,7 +13,7 @@ public class PlayerOnlineChangePostEvent extends PlayerEvent {
 	 * @param player    The player whose the online status has changed.
 	 * @param oldOnline The old player's online status.
 	 */
-	public PlayerOnlineChangePostEvent(IVocalPlayer player, boolean oldOnline) {
+	public VocalPlayerOnlineChangePostEvent(IVocalPlayer player, boolean oldOnline) {
 		super(player);
 		this.oldOnline = oldOnline;
 	}

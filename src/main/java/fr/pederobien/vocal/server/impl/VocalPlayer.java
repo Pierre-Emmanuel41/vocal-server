@@ -7,16 +7,16 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import fr.pederobien.utils.event.EventManager;
-import fr.pederobien.vocal.server.event.PlayerDeafenChangePostEvent;
-import fr.pederobien.vocal.server.event.PlayerDeafenChangePreEvent;
-import fr.pederobien.vocal.server.event.PlayerMuteByChangePostEvent;
-import fr.pederobien.vocal.server.event.PlayerMuteByChangePreEvent;
-import fr.pederobien.vocal.server.event.PlayerMuteChangePostEvent;
-import fr.pederobien.vocal.server.event.PlayerMuteChangePreEvent;
-import fr.pederobien.vocal.server.event.PlayerNameChangePostEvent;
-import fr.pederobien.vocal.server.event.PlayerNameChangePreEvent;
-import fr.pederobien.vocal.server.event.PlayerOnlineChangePostEvent;
-import fr.pederobien.vocal.server.event.PlayerOnlineChangePreEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerDeafenChangePostEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerDeafenChangePreEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerMuteByChangePostEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerMuteByChangePreEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerMuteChangePostEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerMuteChangePreEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerNameChangePostEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerNameChangePreEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerOnlineChangePostEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerOnlineChangePreEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
@@ -65,7 +65,7 @@ public class VocalPlayer implements IVocalPlayer {
 				return;
 
 			String oldName = this.name;
-			EventManager.callEvent(new PlayerNameChangePreEvent(this, name), () -> this.name = name, new PlayerNameChangePostEvent(this, oldName));
+			EventManager.callEvent(new VocalPlayerNameChangePreEvent(this, name), () -> this.name = name, new VocalPlayerNameChangePostEvent(this, oldName));
 		} finally {
 			lock.unlock();
 		}
@@ -84,7 +84,7 @@ public class VocalPlayer implements IVocalPlayer {
 				return;
 
 			boolean oldOnline = this.isOnline;
-			EventManager.callEvent(new PlayerOnlineChangePreEvent(this, isOnline), () -> this.isOnline = isOnline, new PlayerOnlineChangePostEvent(this, oldOnline));
+			EventManager.callEvent(new VocalPlayerOnlineChangePreEvent(this, isOnline), () -> this.isOnline = isOnline, new VocalPlayerOnlineChangePostEvent(this, oldOnline));
 		} finally {
 			lock.unlock();
 		}
@@ -103,7 +103,7 @@ public class VocalPlayer implements IVocalPlayer {
 				return;
 
 			boolean oldMute = this.isMute;
-			EventManager.callEvent(new PlayerMuteChangePreEvent(this, isMute), () -> this.isMute = isMute, new PlayerMuteChangePostEvent(this, oldMute));
+			EventManager.callEvent(new VocalPlayerMuteChangePreEvent(this, isMute), () -> this.isMute = isMute, new VocalPlayerMuteChangePostEvent(this, oldMute));
 		} finally {
 			lock.unlock();
 		}
@@ -123,7 +123,7 @@ public class VocalPlayer implements IVocalPlayer {
 			if (isMuteby == isMute)
 				return;
 
-			EventManager.callEvent(new PlayerMuteByChangePreEvent(this, player, isMute), () -> setMuteBy0(player, isMute));
+			EventManager.callEvent(new VocalPlayerMuteByChangePreEvent(this, player, isMute), () -> setMuteBy0(player, isMute));
 		} finally {
 			lock.unlock();
 		}
@@ -142,7 +142,7 @@ public class VocalPlayer implements IVocalPlayer {
 				return;
 
 			boolean oldDeafen = this.isDeafen;
-			EventManager.callEvent(new PlayerDeafenChangePreEvent(this, isDeafen), () -> this.isDeafen = isDeafen, new PlayerDeafenChangePostEvent(this, oldDeafen));
+			EventManager.callEvent(new VocalPlayerDeafenChangePreEvent(this, isDeafen), () -> this.isDeafen = isDeafen, new VocalPlayerDeafenChangePostEvent(this, oldDeafen));
 		} finally {
 			lock.unlock();
 		}
@@ -172,6 +172,6 @@ public class VocalPlayer implements IVocalPlayer {
 			lock.unlock();
 		}
 
-		EventManager.callEvent(new PlayerMuteByChangePostEvent(this, source, oldMute));
+		EventManager.callEvent(new VocalPlayerMuteByChangePostEvent(this, source, oldMute));
 	}
 }

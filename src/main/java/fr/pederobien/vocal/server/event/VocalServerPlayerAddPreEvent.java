@@ -6,7 +6,7 @@ import fr.pederobien.utils.ICancellable;
 import fr.pederobien.vocal.server.interfaces.IServerPlayerList;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class ServerPlayerAddPreEvent extends ServerPlayerListEvent implements ICancellable {
+public class VocalServerPlayerAddPreEvent extends VocalServerPlayerListEvent implements ICancellable {
 	private boolean isCancelled;
 	private IVocalPlayer player;
 
@@ -16,7 +16,7 @@ public class ServerPlayerAddPreEvent extends ServerPlayerListEvent implements IC
 	 * @param list   The list to which a player is about to be added.
 	 * @param player The added player.
 	 */
-	public ServerPlayerAddPreEvent(IServerPlayerList list, IVocalPlayer player) {
+	public VocalServerPlayerAddPreEvent(IServerPlayerList list, IVocalPlayer player) {
 		super(list);
 		this.player = player;
 	}

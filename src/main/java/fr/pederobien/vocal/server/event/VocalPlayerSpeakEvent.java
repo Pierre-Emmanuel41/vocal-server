@@ -8,7 +8,7 @@ import fr.pederobien.vocal.common.impl.VolumeResult;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
-public class PlayerSpeakEvent extends ProjectVocalServerEvent {
+public class VocalPlayerSpeakEvent extends ProjectVocalServerEvent {
 	private IVocalServer server;
 	private IVocalPlayer transmitter;
 	private Map<String, IVocalPlayer> players;
@@ -25,7 +25,7 @@ public class PlayerSpeakEvent extends ProjectVocalServerEvent {
 	 * @param transmitter The speaking player.
 	 * @param data        The bytes array that represents an audio sample.
 	 */
-	public PlayerSpeakEvent(IVocalServer server, IVocalPlayer transmitter, byte[] data) {
+	public VocalPlayerSpeakEvent(IVocalServer server, IVocalPlayer transmitter, byte[] data) {
 		this.server = server;
 		this.transmitter = transmitter;
 		this.data = data;

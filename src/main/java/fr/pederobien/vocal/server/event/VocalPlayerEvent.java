@@ -2,7 +2,7 @@ package fr.pederobien.vocal.server.event;
 
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class PlayerEvent extends ProjectVocalServerEvent {
+public class VocalPlayerEvent extends ProjectVocalServerEvent {
 	private IVocalPlayer player;
 
 	/**
@@ -10,7 +10,7 @@ public class PlayerEvent extends ProjectVocalServerEvent {
 	 * 
 	 * @param player The player source involved in this event.
 	 */
-	public PlayerEvent(IVocalPlayer player) {
+	public VocalPlayerEvent(IVocalPlayer player) {
 		this.player = player;
 	}
 
