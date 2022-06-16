@@ -3,6 +3,11 @@ package fr.pederobien.vocal.server.interfaces;
 public interface IVocalServer {
 
 	/**
+	 * @return The name of this server.
+	 */
+	String getName();
+
+	/**
 	 * Open this server in order to accept players.
 	 */
 	void open();
@@ -13,12 +18,12 @@ public interface IVocalServer {
 	void close();
 
 	/**
-	 * @return The name of this server.
+	 * @return If the server has been opened or the method {@link #close()} has not been called.
 	 */
-	String getName();
+	boolean isOpened();
 
 	/**
-	 * @return The number for the UDP communication.
+	 * @return The port number for the TCP and UDP communication.
 	 */
 	int getPort();
 
@@ -26,4 +31,9 @@ public interface IVocalServer {
 	 * @return A list that contains players registered on this server.
 	 */
 	IServerPlayerList getPlayers();
+
+	/**
+	 * @return The manager responsible to create messages to send to the remote.
+	 */
+	IServerRequestManager getRequestManager();
 }
