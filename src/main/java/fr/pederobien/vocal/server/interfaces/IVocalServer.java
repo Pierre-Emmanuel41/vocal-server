@@ -25,5 +25,5 @@ public interface IVocalServer {
 	/**
 	 * @return A list that contains players registered on this server.
 	 */
-	IPlayerList getPlayers();
+	IServerPlayerList getPlayers();
 }

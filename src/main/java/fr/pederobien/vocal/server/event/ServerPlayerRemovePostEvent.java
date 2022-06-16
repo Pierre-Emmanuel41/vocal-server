@@ -2,25 +2,25 @@ package fr.pederobien.vocal.server.event;
 
 import java.util.StringJoiner;
 
-import fr.pederobien.vocal.server.interfaces.IPlayerList;
+import fr.pederobien.vocal.server.interfaces.IServerPlayerList;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 
-public class VocalPlayerListPlayerAddPostEvent extends VocalPlayerListEvent {
+public class ServerPlayerRemovePostEvent extends ServerPlayerListEvent {
 	private IVocalPlayer player;
 
 	/**
-	 * Creates an event thrown when a player has been added to a player list.
+	 * Creates an event thrown when a player has been removed to a player list.
 	 * 
-	 * @param list   The list to which a player has been added.
-	 * @param player The added player.
+	 * @param list   The list to which a player has been removed.
+	 * @param player The removed player.
 	 */
-	public VocalPlayerListPlayerAddPostEvent(IPlayerList list, IVocalPlayer player) {
+	public ServerPlayerRemovePostEvent(IServerPlayerList list, IVocalPlayer player) {
 		super(list);
 		this.player = player;
 	}
 
 	/**
-	 * @return The added player.
+	 * @return The removed player.
 	 */
 	public IVocalPlayer getPlayer() {
 		return player;

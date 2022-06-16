@@ -15,6 +15,7 @@ import fr.pederobien.vocal.common.impl.VolumeResult;
 import fr.pederobien.vocal.common.impl.messages.v10.PlayerSpeakInfoMessageV10;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.event.PlayerSpeakEvent;
+import fr.pederobien.vocal.server.interfaces.IServerPlayerList;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
@@ -22,7 +23,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 	private static final double EPSILON = Math.pow(10, -4);
 	private String name;
 	private int port;
-	private PlayerList players;
+	private IServerPlayerList players;
 	private UdpServer udpServer;
 	private VocalMessageFactory factory;
 
@@ -36,7 +37,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 		this.name = name;
 		this.port = port;
 
-		players = new PlayerList(this);
+		players = new ServerPlayerList(this);
 		udpServer = new UdpServer(getName(), getPort(), () -> new VocalMessageExtractor());
 		factory = VocalMessageFactory.getInstance(10000);
 
@@ -64,7 +65,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 	}
 
 	@Override
-	public PlayerList getPlayers() {
+	public IServerPlayerList getPlayers() {
 		return players;
 	}
 
@@ -81,23 +82,32 @@ public class VocalServer implements IVocalServer, IEventListener {
 		// Checking if the player is know by the server.
 		PlayerSpeakInfoMessageV10 playerSpeakMessage = (PlayerSpeakInfoMessageV10) message;
 		Optional<IVocalPlayer> optPlayer = getPlayers().get(playerSpeakMessage.getPlayerName());
-		IVocalPlayer player = optPlayer.isPresent() ? optPlayer.get() : getPlayers().add(playerSpeakMessage.getPlayerName(), event.getAddress());
+
+		if (!optPlayer.isPresent())
+			return;
+
+		IVocalPlayer player = optPlayer.get();
 
 		// Dispatching the player speak event in order to specify to which person the transmitter speak
 		PlayerSpeakEvent playerSpeakEvent = new PlayerSpeakEvent(this, player, playerSpeakMessage.getData());
 		EventManager.callEvent(playerSpeakEvent);
 
 		// Sending the audio sample to the concerned players.
-		String transmitter = playerSpeakEvent.getTransmitter().getName();
+		IVocalPlayer transmitter = playerSpeakEvent.getTransmitter();
 		byte[] data = playerSpeakEvent.getData();
-		playerSpeakEvent.getVolumes().keySet().parallelStream().forEach(p -> {
-			// Checking volume before sending.
-			VolumeResult volume = playerSpeakEvent.getVolumes().get(p);
-			if (volume.getGlobal() < EPSILON)
+		playerSpeakEvent.getVolumes().keySet().parallelStream().forEach(receiver -> {
+
+			// Checking if the receiver can accept audio sample from the transmitter
+			if (!receiver.isOnline() || receiver.isDeafen() || transmitter.isMuteBy(receiver))
 				return;
 
-			IVocalMessage response = factory.create(VocalIdentifier.PLAYER_SPEAK_SET, transmitter, data, volume);
-			udpServer.getConnection().send(new AddressMessage(response.generate(), response.getHeader().getSequence(), p.getAddress()));
+			// Checking volume before sending.
+			VolumeResult volume = playerSpeakEvent.getVolumes().get(receiver);
+			if (volume == null || volume.getGlobal() < EPSILON)
+				return;
+
+			IVocalMessage response = factory.create(VocalIdentifier.PLAYER_SPEAK_SET, transmitter.getName(), data, volume);
+			udpServer.getConnection().send(new AddressMessage(response.generate(), response.getHeader().getSequence(), receiver.getAddress()));
 		});
 	}
 }
