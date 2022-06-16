@@ -7,6 +7,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import fr.pederobien.utils.event.EventManager;
+import fr.pederobien.vocal.server.event.PlayerMuteByChangePostEvent;
+import fr.pederobien.vocal.server.event.PlayerMuteByChangePreEvent;
 import fr.pederobien.vocal.server.event.PlayerMuteChangePostEvent;
 import fr.pederobien.vocal.server.event.PlayerMuteChangePreEvent;
 import fr.pederobien.vocal.server.event.PlayerNameChangePostEvent;
@@ -90,7 +92,16 @@ public class VocalPlayer implements IVocalPlayer {
 
 	@Override
 	public void setMuteBy(IVocalPlayer player, boolean isMute) {
-		setMuteBy0(player, isMute);
+		lock.lock();
+		try {
+			boolean isMuteby = isMuteBy(player);
+			if (isMuteby == isMute)
+				return;
+
+			EventManager.callEvent(new PlayerMuteByChangePreEvent(this, player, isMute), () -> setMuteBy0(player, isMute));
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
@@ -132,5 +143,7 @@ public class VocalPlayer implements IVocalPlayer {
 		} finally {
 			lock.unlock();
 		}
+
+		EventManager.callEvent(new PlayerMuteByChangePostEvent(this, source, oldMute));
 	}
 }
