@@ -3,11 +3,12 @@ package fr.pederobien.vocal.server.impl;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import fr.pederobien.utils.event.EventManager;
+import fr.pederobien.vocal.server.event.PlayerMuteChangePostEvent;
+import fr.pederobien.vocal.server.event.PlayerMuteChangePreEvent;
 import fr.pederobien.vocal.server.event.PlayerNameChangePostEvent;
 import fr.pederobien.vocal.server.event.PlayerNameChangePreEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
@@ -16,7 +17,7 @@ import fr.pederobien.vocal.server.interfaces.IVocalServer;
 public class VocalPlayer implements IVocalPlayer {
 	private IVocalServer server;
 	private String name;
-	private AtomicBoolean isMute, isDeafen;
+	private boolean isMute, isDeafen;
 	private Map<IVocalPlayer, Boolean> isMuteBy;
 	private InetSocketAddress address;
 	private Lock lock;
@@ -32,8 +33,8 @@ public class VocalPlayer implements IVocalPlayer {
 		this.name = name;
 		this.address = address;
 
-		this.isMute = new AtomicBoolean(isMute);
-		this.isDeafen = new AtomicBoolean(isDeafen);
+		this.isMute = isMute;
+		this.isDeafen = isDeafen;
 		isMuteBy = new HashMap<IVocalPlayer, Boolean>();
 		lock = new ReentrantLock(true);
 	}
@@ -64,14 +65,21 @@ public class VocalPlayer implements IVocalPlayer {
 
 	@Override
 	public boolean isMute() {
-		return isMute.get();
+		return isMute;
 	}
 
 	@Override
 	public void setMute(boolean isMute) {
-		if (!this.isMute.compareAndSet(!isMute, isMute))
-			return;
+		lock.lock();
+		try {
+			if (!this.isMute == isMute)
+				return;
 
+			boolean oldMute = this.isMute;
+			EventManager.callEvent(new PlayerMuteChangePreEvent(this, isMute), () -> this.isMute = isMute, new PlayerMuteChangePostEvent(this, oldMute));
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
@@ -87,13 +95,18 @@ public class VocalPlayer implements IVocalPlayer {
 
 	@Override
 	public boolean isDeafen() {
-		return isDeafen.get();
+		return isDeafen;
 	}
 
 	@Override
 	public void setDeafen(boolean isDeafen) {
-		if (!this.isDeafen.compareAndSet(!isDeafen, isDeafen))
-			return;
+		lock.lock();
+		try {
+			if (this.isDeafen == isDeafen)
+				return;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
