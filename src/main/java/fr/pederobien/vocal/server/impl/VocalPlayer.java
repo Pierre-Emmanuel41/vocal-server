@@ -7,6 +7,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import fr.pederobien.utils.event.EventManager;
+import fr.pederobien.vocal.server.event.PlayerNameChangePostEvent;
+import fr.pederobien.vocal.server.event.PlayerNameChangePreEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
@@ -47,7 +50,16 @@ public class VocalPlayer implements IVocalPlayer {
 
 	@Override
 	public void setName(String name) {
-		this.name = name;
+		lock.lock();
+		try {
+			if (this.name.equals(name))
+				return;
+
+			String oldName = this.name;
+			EventManager.callEvent(new PlayerNameChangePreEvent(this, name), () -> this.name = name, new PlayerNameChangePostEvent(this, oldName));
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
