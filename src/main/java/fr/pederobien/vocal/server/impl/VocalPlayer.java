@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import fr.pederobien.communication.interfaces.ITcpConnection;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.vocal.server.event.VocalPlayerDeafenChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerDeafenChangePreEvent;
@@ -25,7 +26,8 @@ public class VocalPlayer implements IVocalPlayer {
 	private String name;
 	private boolean isOnline, isMute, isDeafen;
 	private Map<IVocalPlayer, Boolean> isMuteBy;
-	private InetSocketAddress address;
+	private ITcpConnection tcpConnection;
+	private InetSocketAddress udpAddress;
 	private Lock lock;
 
 	/**
@@ -37,12 +39,11 @@ public class VocalPlayer implements IVocalPlayer {
 	 * @param isMute   True if the player is mute, false otherwise.
 	 * @param isDeafen True if the player is deafen, false otherwise.
 	 */
-	public VocalPlayer(IVocalServer server, String name, InetSocketAddress address, boolean isMute, boolean isDeafen) {
-		this.name = name;
-		this.address = address;
+	public VocalPlayer(IVocalServer server) {
+		this.name = "Unknown";
 
-		this.isMute = isMute;
-		this.isDeafen = isDeafen;
+		this.isMute = true;
+		this.isDeafen = true;
 		isMuteBy = new HashMap<IVocalPlayer, Boolean>();
 		lock = new ReentrantLock(true);
 	}
@@ -84,7 +85,8 @@ public class VocalPlayer implements IVocalPlayer {
 				return;
 
 			boolean oldOnline = this.isOnline;
-			EventManager.callEvent(new VocalPlayerOnlineChangePreEvent(this, isOnline), () -> this.isOnline = isOnline, new VocalPlayerOnlineChangePostEvent(this, oldOnline));
+			EventManager.callEvent(new VocalPlayerOnlineChangePreEvent(this, isOnline), () -> this.isOnline = isOnline,
+					new VocalPlayerOnlineChangePostEvent(this, oldOnline));
 		} finally {
 			lock.unlock();
 		}
@@ -142,15 +144,21 @@ public class VocalPlayer implements IVocalPlayer {
 				return;
 
 			boolean oldDeafen = this.isDeafen;
-			EventManager.callEvent(new VocalPlayerDeafenChangePreEvent(this, isDeafen), () -> this.isDeafen = isDeafen, new VocalPlayerDeafenChangePostEvent(this, oldDeafen));
+			EventManager.callEvent(new VocalPlayerDeafenChangePreEvent(this, isDeafen), () -> this.isDeafen = isDeafen,
+					new VocalPlayerDeafenChangePostEvent(this, oldDeafen));
 		} finally {
 			lock.unlock();
 		}
 	}
 
 	@Override
-	public InetSocketAddress getAddress() {
-		return address;
+	public InetSocketAddress getTcpAddress() {
+		return tcpConnection.getAddress();
+	}
+
+	@Override
+	public InetSocketAddress getUdpAddress() {
+		return udpAddress;
 	}
 
 	/**

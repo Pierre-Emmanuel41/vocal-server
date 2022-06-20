@@ -75,7 +75,12 @@ public interface IVocalPlayer {
 	void setDeafen(boolean isDeafen);
 
 	/**
+	 * @return The address used for the TCP communication.
+	 */
+	InetSocketAddress getTcpAddress();
+
+	/**
 	 * @return The address used for the UDP communication.
 	 */
-	InetSocketAddress getAddress();
+	InetSocketAddress getUdpAddress();
 }

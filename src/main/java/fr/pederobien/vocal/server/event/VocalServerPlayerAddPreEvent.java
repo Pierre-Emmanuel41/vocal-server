@@ -43,7 +43,7 @@ public class VocalServerPlayerAddPreEvent extends VocalServerPlayerListEvent imp
 		StringJoiner joiner = new StringJoiner(", ", "{", "}");
 		joiner.add("list=" + getList().getName());
 		joiner.add("name=" + getPlayer());
-		joiner.add("address=" + getPlayer().getAddress());
+		joiner.add("tcpAddress=" + getPlayer().getTcpAddress());
 		joiner.add("isMute=" + getPlayer().isMute());
 		joiner.add("isDeafen=" + getPlayer().isDeafen());
 		return String.format("%s_%s", getName(), joiner);
