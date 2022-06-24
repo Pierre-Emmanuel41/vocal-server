@@ -12,7 +12,6 @@ import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.utils.event.EventPriority;
 import fr.pederobien.utils.event.IEventListener;
-import fr.pederobien.utils.event.LogEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientAddPostEvent;
 
 public class ClientList implements IEventListener {
@@ -31,7 +30,6 @@ public class ClientList implements IEventListener {
 		clients = new ArrayList<PlayerVocalClient>();
 		lock = new ReentrantLock(true);
 
-		EventManager.callEvent(new LogEvent("Creating clients list"));
 		EventManager.registerListener(this);
 	}
 
@@ -63,7 +61,6 @@ public class ClientList implements IEventListener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onNewClient(NewTcpClientEvent event) {
-		EventManager.callEvent(new LogEvent("Registering a new client"));
 		if (!event.getServer().equals(server.getTcpServer()))
 			return;
 

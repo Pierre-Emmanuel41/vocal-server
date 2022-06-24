@@ -56,7 +56,6 @@ public class VocalServer implements IVocalServer, IEventListener {
 
 		tcpServer.connect();
 		clients.clear();
-		EventManager.unregisterListener(clients);
 		// udpServer.connect();
 	}
 
@@ -66,6 +65,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 			return;
 
 		tcpServer.disconnect();
+		EventManager.unregisterListener(clients);
 		// udpServer.disconnect();
 	}
 
