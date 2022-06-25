@@ -35,15 +35,15 @@ public class VocalPlayer implements IVocalPlayer {
 	 * 
 	 * @param server   The server on which this player is registered.
 	 * @param name     The name of this player.
-	 * @param address  The address of this player.
 	 * @param isMute   True if the player is mute, false otherwise.
 	 * @param isDeafen True if the player is deafen, false otherwise.
 	 */
-	public VocalPlayer(IVocalServer server) {
-		this.name = "Unknown";
+	public VocalPlayer(IVocalServer server, String name, boolean isMute, boolean isDeafen) {
+		this.server = server;
+		this.name = name;
 
-		this.isMute = true;
-		this.isDeafen = true;
+		this.isMute = isMute;
+		this.isDeafen = isDeafen;
 		isMuteBy = new HashMap<IVocalPlayer, Boolean>();
 		lock = new ReentrantLock(true);
 	}

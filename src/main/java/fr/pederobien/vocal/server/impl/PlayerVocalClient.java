@@ -8,13 +8,16 @@ import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.utils.event.IEventListener;
 import fr.pederobien.vocal.common.impl.VocalErrorCode;
+import fr.pederobien.vocal.common.impl.VocalIdentifier;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
+import fr.pederobien.vocal.server.event.VocalServerClientJoinPostEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
 public class PlayerVocalClient extends AbstractVocalConnection implements IEventListener {
 	private IVocalPlayer player;
 	private AtomicBoolean isRegistered;
+	private AtomicBoolean isJoined;
 
 	/**
 	 * Creates a client associated to a specific player.
@@ -25,8 +28,8 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 	public PlayerVocalClient(IVocalServer server, ITcpConnection connection) {
 		super(server, connection);
 
-		player = new VocalPlayer(server);
 		isRegistered = new AtomicBoolean(false);
+		isJoined = new AtomicBoolean(false);
 
 		EventManager.registerListener(this);
 	}
@@ -36,6 +39,24 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 	 */
 	public IVocalPlayer getPlayer() {
 		return player;
+	}
+
+	/**
+	 * Creates a player associated to the given name.
+	 * 
+	 * @param name     The player's name.
+	 * @param isMute   The player's mute status.
+	 * @param isDeafen The player's deafen status.
+	 * 
+	 * @return True if the player has been created, false otherwise.
+	 */
+	public boolean join(String name, boolean isMute, boolean isDeafen) {
+		if (!isJoined.compareAndSet(false, true))
+			return false;
+
+		player = new VocalPlayer(getServer(), name, isMute, isDeafen);
+		EventManager.callEvent(new VocalServerClientJoinPostEvent(getServer(), this));
+		return true;
 	}
 
 	@Override
@@ -69,6 +90,12 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 	// }
 
 	private boolean checkPermission(IVocalMessage request) {
-		return true;
+		if (request.getHeader().getIdentifier() == VocalIdentifier.SET_SERVER_JOIN)
+			return true;
+
+		if (!isJoined.get())
+			return false;
+
+		return false;
 	}
 }

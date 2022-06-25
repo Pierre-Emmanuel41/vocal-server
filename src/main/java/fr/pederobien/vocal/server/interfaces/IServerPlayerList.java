@@ -33,5 +33,5 @@ public interface IServerPlayerList extends Iterable<IVocalPlayer> {
 	/**
 	 * @return A copy of the underlying player list.
 	 */
-	List<IVocalPlayer> list();
+	List<IVocalPlayer> toList();
 }

@@ -33,7 +33,7 @@ public class VocalPlayerSpeakEvent extends ProjectVocalServerEvent {
 		this.players = new HashMap<String, IVocalPlayer>();
 		volumes = new HashMap<IVocalPlayer, VolumeResult>();
 
-		for (IVocalPlayer player : server.getPlayers().list())
+		for (IVocalPlayer player : server.getPlayers().toList())
 			this.players.put(player.getName(), player);
 	}
 

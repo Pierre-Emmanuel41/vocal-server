@@ -14,6 +14,7 @@ import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.utils.event.IEventListener;
 import fr.pederobien.vocal.server.event.VocalPlayerNameChangePostEvent;
+import fr.pederobien.vocal.server.event.VocalServerClientJoinPostEvent;
 import fr.pederobien.vocal.server.event.VocalServerPlayerAddPostEvent;
 import fr.pederobien.vocal.server.event.VocalServerPlayerRemovePostEvent;
 import fr.pederobien.vocal.server.exceptions.ServerPlayerListPlayerAlreadyRegisteredException;
@@ -62,11 +63,11 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 
 	@Override
 	public Stream<IVocalPlayer> stream() {
-		return list().stream();
+		return toList().stream();
 	}
 
 	@Override
-	public List<IVocalPlayer> list() {
+	public List<IVocalPlayer> toList() {
 		return new ArrayList<IVocalPlayer>(players.values());
 	}
 
@@ -87,6 +88,14 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 		} finally {
 			lock.unlock();
 		}
+	}
+
+	@EventHandler
+	private void onClientJoin(VocalServerClientJoinPostEvent event) {
+		if (!event.getServer().equals(getServer()))
+			return;
+
+		addPlayer(event.getClient().getPlayer());
 	}
 
 	/**
