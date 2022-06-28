@@ -2,6 +2,7 @@ package fr.pederobien.vocal.server.impl;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import fr.pederobien.communication.event.ConnectionLostEvent;
 import fr.pederobien.communication.event.UnexpectedDataReceivedEvent;
 import fr.pederobien.communication.interfaces.ITcpConnection;
 import fr.pederobien.utils.event.EventHandler;
@@ -10,7 +11,9 @@ import fr.pederobien.utils.event.IEventListener;
 import fr.pederobien.vocal.common.impl.VocalErrorCode;
 import fr.pederobien.vocal.common.impl.VocalIdentifier;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
+import fr.pederobien.vocal.server.event.VocalClientDisconnectPostEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientJoinPostEvent;
+import fr.pederobien.vocal.server.event.VocalServerClientLeavePostEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
@@ -30,8 +33,6 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 
 		isRegistered = new AtomicBoolean(false);
 		isJoined = new AtomicBoolean(false);
-
-		EventManager.registerListener(this);
 	}
 
 	/**
@@ -73,21 +74,30 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		if (request == null)
 			return;
 
+		// Always allow this request whatever the client state.
+		if (request.getHeader().getIdentifier() == VocalIdentifier.SET_SERVER_LEAVE) {
+			isJoined.set(false);
+			EventManager.callEvent(new VocalServerClientLeavePostEvent(getServer(), this));
+			send(VocalServerMessageFactory.answer(request));
+			return;
+		}
+
 		if (checkPermission(request))
 			send(getServer().getRequestManager().answer(new RequestReceivedHolder(request, this)));
 		else
 			send(VocalServerMessageFactory.answer(request, VocalErrorCode.PERMISSION_REFUSED));
 	}
 
-	// @EventHandler
-	// private void onConnectionLost(ConnectionLostEvent event) {
-	// Always allow this request whatever the client state.
-	// if (request.getHeader().getIdentifier() == Identifier.SET_SERVER_LEAVE) {
-	// EventManager.callEvent(new ServerClientLeavePostEvent(getServer(), this));
-	// send(MumbleServerMessageFactory.answer(request));
-	// return;
-	// }
-	// }
+	@EventHandler
+	private void OnConnectionLostEvent(ConnectionLostEvent event) {
+		if (!event.getConnection().equals(getTcpConnection()))
+			return;
+
+		isJoined.set(false);
+		getTcpConnection().dispose();
+		EventManager.callEvent(new VocalClientDisconnectPostEvent(this));
+		EventManager.unregisterListener(this);
+	}
 
 	private boolean checkPermission(IVocalMessage request) {
 		if (request.getHeader().getIdentifier() == VocalIdentifier.SET_SERVER_JOIN)
@@ -96,6 +106,11 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		if (!isJoined.get())
 			return false;
 
-		return false;
+		switch (request.getHeader().getIdentifier()) {
+		case GET_SERVER_CONFIGURATION:
+			return true;
+		default:
+			return false;
+		}
 	}
 }

@@ -13,8 +13,10 @@ import java.util.stream.Stream;
 import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.utils.event.IEventListener;
+import fr.pederobien.vocal.server.event.VocalClientDisconnectPostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerNameChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientJoinPostEvent;
+import fr.pederobien.vocal.server.event.VocalServerClientLeavePostEvent;
 import fr.pederobien.vocal.server.event.VocalServerPlayerAddPostEvent;
 import fr.pederobien.vocal.server.event.VocalServerPlayerRemovePostEvent;
 import fr.pederobien.vocal.server.exceptions.ServerPlayerListPlayerAlreadyRegisteredException;
@@ -98,6 +100,22 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 		addPlayer(event.getClient().getPlayer());
 	}
 
+	@EventHandler
+	private void onClientLeave(VocalServerClientLeavePostEvent event) {
+		if (!event.getServer().equals(getServer()))
+			return;
+
+		removePlayer(event.getClient().getPlayer());
+	}
+
+	@EventHandler
+	private void onClientDisconnect(VocalClientDisconnectPostEvent event) {
+		if (!event.getClient().getServer().equals(getServer()))
+			return;
+
+		removePlayer(event.getClient().getPlayer());
+	}
+
 	/**
 	 * Thread safe operation that consists in adding the given player to this list.
 	 * 
@@ -117,22 +135,15 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 	/**
 	 * Thread safe operation that consists in removing the player associated to the given name.
 	 * 
-	 * @param name The name of the player to remove.
-	 * 
-	 * @return The remove player if registered, null otherwise.
+	 * @param player The player to remove.
 	 */
-	private IVocalPlayer removePlayer(String name) {
+	private void removePlayer(IVocalPlayer player) {
 		lock.lock();
-		IVocalPlayer player = null;
 		try {
-			player = players.remove(name);
+			if (players.remove(player.getName()) != null)
+				EventManager.callEvent(new VocalServerPlayerRemovePostEvent(this, player));
 		} finally {
 			lock.unlock();
 		}
-
-		if (player != null)
-			EventManager.callEvent(new VocalServerPlayerRemovePostEvent(this, player));
-
-		return player;
 	}
 }
