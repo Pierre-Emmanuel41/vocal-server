@@ -38,6 +38,27 @@ public class RequestManagerV10 extends RequestManager {
 		return create(getVersion(), VocalIdentifier.SET_CP_VERSION, version);
 	}
 
+	@Override
+	public IVocalMessage onServerPlayerAdd(IVocalPlayer player) {
+		List<Object> properties = new ArrayList<Object>();
+
+		// Player's name
+		properties.add(player.getName());
+
+		// Player's mute status
+		properties.add(player.isMute());
+
+		// Player's deafen status
+		properties.add(player.isDeafen());
+
+		return create(getVersion(), VocalIdentifier.REGISTER_PLAYER_ON_SERVER, properties.toArray());
+	}
+
+	@Override
+	public IVocalMessage onServerPlayerRemove(IVocalPlayer player) {
+		return create(getVersion(), VocalIdentifier.UNREGISTER_PLAYER_FROM_SERVER, player.getName());
+	}
+
 	/**
 	 * Creates a message that contains the current server configuration.
 	 * 

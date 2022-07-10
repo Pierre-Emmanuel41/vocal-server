@@ -14,6 +14,8 @@ import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.event.VocalClientDisconnectPostEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientJoinPostEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientLeavePostEvent;
+import fr.pederobien.vocal.server.event.VocalServerPlayerAddPostEvent;
+import fr.pederobien.vocal.server.event.VocalServerPlayerRemovePostEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
@@ -69,6 +71,22 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 	}
 
 	@EventHandler
+	private void onServerPlayerAdd(VocalServerPlayerAddPostEvent event) {
+		if (!event.getList().getServer().equals(getServer()))
+			return;
+
+		doIfPlayerJoined(() -> send(getServer().getRequestManager().onServerPlayerAdd(getVersion(), event.getPlayer())));
+	}
+
+	@EventHandler
+	private void onServerPlayerRemove(VocalServerPlayerRemovePostEvent event) {
+		if (!event.getList().getServer().equals(getServer()))
+			return;
+
+		doIfPlayerJoined(() -> send(getServer().getRequestManager().onServerPlayerRemove(getVersion(), event.getPlayer())));
+	}
+
+	@EventHandler
 	private void onUnexpectedDataReceived(UnexpectedDataReceivedEvent event) {
 		IVocalMessage request = checkReceivedRequest(event);
 		if (request == null)
@@ -112,5 +130,10 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		default:
 			return false;
 		}
+	}
+
+	private void doIfPlayerJoined(Runnable runnable) {
+		if (isJoined.get())
+			runnable.run();
 	}
 }

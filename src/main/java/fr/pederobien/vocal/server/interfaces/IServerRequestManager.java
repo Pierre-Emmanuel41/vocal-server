@@ -43,4 +43,24 @@ public interface IServerRequestManager {
 	 * @return The message to send to the remote in order to get the latest version of the communication protocol.
 	 */
 	IVocalMessage setCommunicationProtocolVersion(float version);
+
+	/**
+	 * Creates a message in order to register a new player.
+	 * 
+	 * @param version The protocol version to use to create a vocal message.
+	 * @param player  the added player.
+	 * 
+	 * @return The message to send to the remote in order to add a player to a server.
+	 */
+	IVocalMessage onServerPlayerAdd(float version, IVocalPlayer player);
+
+	/**
+	 * Creates a message in order to unregister a player from the vocal server.
+	 * 
+	 * @param version The protocol version to use to create a vocal message.
+	 * @param player  the removed player.
+	 * 
+	 * @return The message to send to the remote in order to remove a player from a server.
+	 */
+	IVocalMessage onServerPlayerRemove(float version, IVocalPlayer player);
 }

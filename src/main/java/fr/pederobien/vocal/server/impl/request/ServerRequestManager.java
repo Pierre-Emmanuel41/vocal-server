@@ -10,6 +10,7 @@ import fr.pederobien.vocal.server.impl.RequestReceivedHolder;
 import fr.pederobien.vocal.server.impl.VocalServerMessageFactory;
 import fr.pederobien.vocal.server.interfaces.IRequestManager;
 import fr.pederobien.vocal.server.interfaces.IServerRequestManager;
+import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
 public class ServerRequestManager implements IServerRequestManager {
@@ -53,6 +54,16 @@ public class ServerRequestManager implements IServerRequestManager {
 	@Override
 	public IVocalMessage setCommunicationProtocolVersion(float version) {
 		return findManagerAndApply(1.0f, manager -> manager.setCommunicationProtocolVersion(version));
+	}
+
+	@Override
+	public IVocalMessage onServerPlayerAdd(float version, IVocalPlayer player) {
+		return findManagerAndApply(version, manager -> manager.onServerPlayerAdd(player));
+	}
+
+	@Override
+	public IVocalMessage onServerPlayerRemove(float version, IVocalPlayer player) {
+		return findManagerAndApply(version, manager -> manager.onServerPlayerRemove(player));
 	}
 
 	private void register(IRequestManager manager) {
