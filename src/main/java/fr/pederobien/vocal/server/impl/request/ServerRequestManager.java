@@ -66,6 +66,11 @@ public class ServerRequestManager implements IServerRequestManager {
 		return findManagerAndApply(version, manager -> manager.onServerPlayerRemove(player));
 	}
 
+	@Override
+	public IVocalMessage onPlayerNameChange(float version, String oldName, String newName) {
+		return findManagerAndApply(version, manager -> manager.onPlayerNameChange(oldName, newName));
+	}
+
 	private void register(IRequestManager manager) {
 		managers.put(manager.getVersion(), manager);
 	}

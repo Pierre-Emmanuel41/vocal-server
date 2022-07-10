@@ -50,4 +50,14 @@ public interface IRequestManager {
 	 * @return The message to send to the remote in order to remove a player from a server.
 	 */
 	IVocalMessage onServerPlayerRemove(IVocalPlayer player);
+
+	/**
+	 * Creates a message in order to change the name of a player.
+	 * 
+	 * @param oldName The old player name.
+	 * @param newName The new player name.
+	 * 
+	 * @return The message to send to the remote in order to update the name of a player.
+	 */
+	IVocalMessage onPlayerNameChange(String oldName, String newName);
 }

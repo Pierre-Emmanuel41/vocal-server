@@ -7,11 +7,13 @@ import fr.pederobien.communication.event.UnexpectedDataReceivedEvent;
 import fr.pederobien.communication.interfaces.ITcpConnection;
 import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
+import fr.pederobien.utils.event.EventPriority;
 import fr.pederobien.utils.event.IEventListener;
 import fr.pederobien.vocal.common.impl.VocalErrorCode;
 import fr.pederobien.vocal.common.impl.VocalIdentifier;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.event.VocalClientDisconnectPostEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerNameChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientJoinPostEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientLeavePostEvent;
 import fr.pederobien.vocal.server.event.VocalServerPlayerAddPostEvent;
@@ -70,7 +72,7 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 			EventManager.registerListener(this);
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onServerPlayerAdd(VocalServerPlayerAddPostEvent event) {
 		if (!event.getList().getServer().equals(getServer()))
 			return;
@@ -78,7 +80,7 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		doIfPlayerJoined(() -> send(getServer().getRequestManager().onServerPlayerAdd(getVersion(), event.getPlayer())));
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onServerPlayerRemove(VocalServerPlayerRemovePostEvent event) {
 		if (!event.getList().getServer().equals(getServer()))
 			return;
@@ -86,7 +88,15 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		doIfPlayerJoined(() -> send(getServer().getRequestManager().onServerPlayerRemove(getVersion(), event.getPlayer())));
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
+	private void onPlayerNameChange(VocalPlayerNameChangePostEvent event) {
+		if (!event.getPlayer().getServer().equals(getServer()))
+			return;
+
+		doIfPlayerJoined(() -> send(getServer().getRequestManager().onPlayerNameChange(getVersion(), event.getOldName(), event.getPlayer().getName())));
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
 	private void onUnexpectedDataReceived(UnexpectedDataReceivedEvent event) {
 		IVocalMessage request = checkReceivedRequest(event);
 		if (request == null)
@@ -106,7 +116,7 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 			send(VocalServerMessageFactory.answer(request, VocalErrorCode.PERMISSION_REFUSED));
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOWEST)
 	private void OnConnectionLostEvent(ConnectionLostEvent event) {
 		if (!event.getConnection().equals(getTcpConnection()))
 			return;
@@ -126,6 +136,7 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 
 		switch (request.getHeader().getIdentifier()) {
 		case GET_SERVER_CONFIGURATION:
+		case SET_PLAYER_NAME:
 			return true;
 		default:
 			return false;

@@ -63,4 +63,15 @@ public interface IServerRequestManager {
 	 * @return The message to send to the remote in order to remove a player from a server.
 	 */
 	IVocalMessage onServerPlayerRemove(float version, IVocalPlayer player);
+
+	/**
+	 * Creates a message in order to change the name of a player.
+	 * 
+	 * @param version The protocol version to use to create a vocal message.
+	 * @param oldName The old player name.
+	 * @param newName The new player name.
+	 * 
+	 * @return The message to send to the remote in order to update the name of a player.
+	 */
+	IVocalMessage onPlayerNameChange(float version, String oldName, String newName);
 }

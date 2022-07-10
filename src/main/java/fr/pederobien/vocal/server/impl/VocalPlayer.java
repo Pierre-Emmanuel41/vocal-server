@@ -59,20 +59,6 @@ public class VocalPlayer implements IVocalPlayer {
 	}
 
 	@Override
-	public void setName(String name) {
-		lock.lock();
-		try {
-			if (this.name.equals(name))
-				return;
-
-			String oldName = this.name;
-			EventManager.callEvent(new VocalPlayerNameChangePreEvent(this, name), () -> this.name = name, new VocalPlayerNameChangePostEvent(this, oldName));
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@Override
 	public boolean isOnline() {
 		return isOnline;
 	}
@@ -159,6 +145,24 @@ public class VocalPlayer implements IVocalPlayer {
 	@Override
 	public InetSocketAddress getUdpAddress() {
 		return udpAddress;
+	}
+
+	/**
+	 * Set the name of this player. For internal use only.
+	 * 
+	 * @param name The new player name.
+	 */
+	public void setName(String name) {
+		lock.lock();
+		try {
+			if (this.name.equals(name))
+				return;
+
+			String oldName = this.name;
+			EventManager.callEvent(new VocalPlayerNameChangePreEvent(this, name), () -> this.name = name, new VocalPlayerNameChangePostEvent(this, oldName));
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	/**

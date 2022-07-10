@@ -92,7 +92,7 @@ public abstract class RequestManager implements IRequestManager {
 	 * 
 	 * @return The message associated to the answer.
 	 */
-	protected IVocalMessage answer(float version, IVocalMessage message, VocalIdentifier errorCode) {
+	protected IVocalMessage answer(float version, IVocalMessage message, VocalErrorCode errorCode) {
 		return VocalServerMessageFactory.answer(version, message, errorCode);
 	}
 

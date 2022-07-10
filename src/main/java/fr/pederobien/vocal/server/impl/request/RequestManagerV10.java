@@ -2,13 +2,16 @@ package fr.pederobien.vocal.server.impl.request;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import fr.pederobien.vocal.common.impl.VocalErrorCode;
 import fr.pederobien.vocal.common.impl.VocalIdentifier;
+import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerNameV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetServerJoinV10;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.impl.PlayerVocalClient;
 import fr.pederobien.vocal.server.impl.RequestReceivedHolder;
+import fr.pederobien.vocal.server.impl.VocalPlayer;
 import fr.pederobien.vocal.server.impl.VocalServerMessageFactory;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
@@ -26,6 +29,9 @@ public class RequestManagerV10 extends RequestManager {
 		// Server message
 		getRequests().put(VocalIdentifier.GET_SERVER_CONFIGURATION, holder -> getServerConfiguration(holder));
 		getRequests().put(VocalIdentifier.SET_SERVER_JOIN, holder -> setServerJoin(holder));
+
+		// Player messages
+		getRequests().put(VocalIdentifier.SET_PLAYER_NAME, holder -> setPlayerName(holder));
 	}
 
 	@Override
@@ -57,6 +63,11 @@ public class RequestManagerV10 extends RequestManager {
 	@Override
 	public IVocalMessage onServerPlayerRemove(IVocalPlayer player) {
 		return create(getVersion(), VocalIdentifier.UNREGISTER_PLAYER_FROM_SERVER, player.getName());
+	}
+
+	@Override
+	public IVocalMessage onPlayerNameChange(String oldName, String newName) {
+		return create(getVersion(), VocalIdentifier.SET_PLAYER_NAME, oldName, newName);
 	}
 
 	/**
@@ -103,5 +114,44 @@ public class RequestManagerV10 extends RequestManager {
 			return VocalServerMessageFactory.answer(holder.getRequest(), VocalErrorCode.SERVER_ALREADY_JOINED);
 
 		return VocalServerMessageFactory.answer(holder.getRequest());
+	}
+
+	/**
+	 * Set the name of a player.
+	 * 
+	 * @param holder The holder that contains the connection that received the request and the request itself.
+	 * 
+	 * @return The server answer.
+	 */
+	private IVocalMessage setPlayerName(RequestReceivedHolder holder) {
+		SetPlayerNameV10 request = (SetPlayerNameV10) holder.getRequest();
+		RunResult result = runIfInstanceof(holder, PlayerVocalClient.class, client -> client.getPlayer().getName().equals(request.getOldName()));
+		Optional<IVocalPlayer> optPlayer;
+
+		// Case when the connection corresponds to a player connection -> Needs to check player's name match.
+		if (result.getHasRun()) {
+			if (!result.getResult())
+				return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_DOES_NOT_MATCH);
+			else
+				optPlayer = Optional.of(((PlayerVocalClient) holder.getConnection()).getPlayer());
+		}
+		// Case when the connection corresponds to a stand-alone connection -> Needs to check if the player exist.
+		else {
+			optPlayer = getServer().getPlayers().get(request.getOldName());
+			if (!optPlayer.isPresent())
+				return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_NOT_FOUND);
+		}
+
+		Optional<IVocalPlayer> optCheck = getServer().getPlayers().get(request.getNewName());
+		if (optCheck.isPresent())
+			return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_ALREADY_EXISTS);
+
+		VocalPlayer player = ((VocalPlayer) optPlayer.get());
+		player.setName(request.getNewName());
+
+		if (!player.getName().equals(request.getNewName()))
+			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
+
+		return answer(getVersion(), request, request.getProperties());
 	}
 }

@@ -15,13 +15,6 @@ public interface IVocalPlayer {
 	String getName();
 
 	/**
-	 * Set the name of this player.
-	 * 
-	 * @param name The new player name.
-	 */
-	void setName(String name);
-
-	/**
 	 * @return True if this player is connected to this server.
 	 */
 	boolean isOnline();
