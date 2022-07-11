@@ -84,20 +84,6 @@ public class VocalPlayer implements IVocalPlayer {
 	}
 
 	@Override
-	public void setMute(boolean isMute) {
-		lock.lock();
-		try {
-			if (!this.isMute == isMute)
-				return;
-
-			boolean oldMute = this.isMute;
-			EventManager.callEvent(new VocalPlayerMuteChangePreEvent(this, isMute), () -> this.isMute = isMute, new VocalPlayerMuteChangePostEvent(this, oldMute));
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@Override
 	public boolean isMuteBy(IVocalPlayer player) {
 		Boolean isMute = isMuteBy.get(player);
 		return isMute == null ? false : isMute;
@@ -160,6 +146,25 @@ public class VocalPlayer implements IVocalPlayer {
 
 			String oldName = this.name;
 			EventManager.callEvent(new VocalPlayerNameChangePreEvent(this, name), () -> this.name = name, new VocalPlayerNameChangePostEvent(this, oldName));
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * Set the new mute status of this player.
+	 * 
+	 * @param isMute True if the player is mute, false otherwise.
+	 */
+	public void setMute(boolean isMute) {
+		lock.lock();
+		try {
+			if (this.isMute == isMute)
+				return;
+
+			boolean oldMute = this.isMute;
+			Runnable update = () -> this.isMute = isMute;
+			EventManager.callEvent(new VocalPlayerMuteChangePreEvent(this, isMute), update, new VocalPlayerMuteChangePostEvent(this, oldMute));
 		} finally {
 			lock.unlock();
 		}

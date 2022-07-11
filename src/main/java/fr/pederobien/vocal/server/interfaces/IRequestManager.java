@@ -60,4 +60,13 @@ public interface IRequestManager {
 	 * @return The message to send to the remote in order to update the name of a player.
 	 */
 	IVocalMessage onPlayerNameChange(String oldName, String newName);
+
+	/**
+	 * Creates a message in order to update the player mute status.
+	 * 
+	 * @param player The player whose the mute status has changed.
+	 * 
+	 * @return The message to send to the remote in order to update the mute status of a player.
+	 */
+	IVocalMessage onPlayerMuteChange(IVocalPlayer player);
 }

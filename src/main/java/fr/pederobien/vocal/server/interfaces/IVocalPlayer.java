@@ -32,13 +32,6 @@ public interface IVocalPlayer {
 	boolean isMute();
 
 	/**
-	 * Set the new mute status of this player.
-	 * 
-	 * @param isMute True if the player is mute, false otherwise.
-	 */
-	void setMute(boolean isMute);
-
-	/**
 	 * Indicates if this player is mute for the given player.
 	 * 
 	 * @param player The player to check.

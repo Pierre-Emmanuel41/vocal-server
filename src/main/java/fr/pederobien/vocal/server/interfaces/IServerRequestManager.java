@@ -74,4 +74,14 @@ public interface IServerRequestManager {
 	 * @return The message to send to the remote in order to update the name of a player.
 	 */
 	IVocalMessage onPlayerNameChange(float version, String oldName, String newName);
+
+	/**
+	 * Creates a message in order to update the player mute status.
+	 * 
+	 * @param version The protocol version to use to create a mumble message.
+	 * @param player  The player whose the mute status has changed.
+	 * 
+	 * @return The message to send to the remote in order to update the mute status of a player.
+	 */
+	IVocalMessage onPlayerMuteChange(float version, IVocalPlayer player);
 }
