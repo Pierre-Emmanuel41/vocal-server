@@ -13,6 +13,7 @@ import fr.pederobien.vocal.common.impl.VocalErrorCode;
 import fr.pederobien.vocal.common.impl.VocalIdentifier;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.event.VocalClientDisconnectPostEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerMuteByChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerMuteChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerNameChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientJoinPostEvent;
@@ -105,6 +106,14 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		doIfPlayerJoined(() -> send(getServer().getRequestManager().onPlayerMuteChange(getVersion(), event.getPlayer())));
 	}
 
+	@EventHandler(priority = EventPriority.HIGHEST)
+	private void onPlayerMuteByChange(VocalPlayerMuteByChangePostEvent event) {
+		if (!event.getPlayer().getServer().equals(getServer()) || !event.getSource().equals(player))
+			return;
+
+		doIfPlayerJoined(() -> send(getServer().getRequestManager().onPlayerMuteByChange(getVersion(), event.getPlayer(), event.getSource())));
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onUnexpectedDataReceived(UnexpectedDataReceivedEvent event) {
 		IVocalMessage request = checkReceivedRequest(event);
@@ -147,6 +156,7 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		case GET_SERVER_CONFIGURATION:
 		case SET_PLAYER_NAME:
 		case SET_PLAYER_MUTE:
+		case SET_PLAYER_MUTE_BY:
 			return true;
 		default:
 			return false;

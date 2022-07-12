@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import fr.pederobien.vocal.common.impl.VocalErrorCode;
 import fr.pederobien.vocal.common.impl.VocalIdentifier;
+import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerMuteByStatusV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerMuteStatusV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerNameV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetServerJoinV10;
@@ -34,6 +35,7 @@ public class RequestManagerV10 extends RequestManager {
 		// Player messages
 		getRequests().put(VocalIdentifier.SET_PLAYER_NAME, holder -> setPlayerName(holder));
 		getRequests().put(VocalIdentifier.SET_PLAYER_MUTE, holder -> setPlayerMute(holder));
+		getRequests().put(VocalIdentifier.SET_PLAYER_MUTE_BY, holder -> setPlayerMuteBy(holder));
 	}
 
 	@Override
@@ -75,6 +77,11 @@ public class RequestManagerV10 extends RequestManager {
 	@Override
 	public IVocalMessage onPlayerMuteChange(IVocalPlayer player) {
 		return create(getVersion(), VocalIdentifier.SET_PLAYER_MUTE, player.getName(), player.isMute());
+	}
+
+	@Override
+	public IVocalMessage onPlayerMuteByChange(IVocalPlayer target, IVocalPlayer source) {
+		return create(getVersion(), VocalIdentifier.SET_PLAYER_MUTE_BY, target.getName(), source.getName(), target.isMuteBy(source));
 	}
 
 	/**
@@ -192,6 +199,44 @@ public class RequestManagerV10 extends RequestManager {
 		player.setMute(request.isMute());
 
 		if (player.isMute() != request.isMute())
+			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
+
+		return answer(getVersion(), request, request.getProperties());
+	}
+
+	/**
+	 * Update the mute status of a player for another player.
+	 * 
+	 * @param holder The holder that contains the connection that received the request and the request itself.
+	 * 
+	 * @return The server answer.
+	 */
+	private IVocalMessage setPlayerMuteBy(RequestReceivedHolder holder) {
+		SetPlayerMuteByStatusV10 request = (SetPlayerMuteByStatusV10) holder.getRequest();
+
+		RunResult result = runIfInstanceof(holder, PlayerVocalClient.class, client -> client.getPlayer().getName().equals(request.getSource()));
+		Optional<IVocalPlayer> optSource;
+
+		// Case when the connection corresponds to a player connection -> Needs to check player's name match.
+		if (result.getHasRun()) {
+			if (!result.getResult())
+				return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_DOES_NOT_MATCH);
+			else
+				optSource = Optional.of(((PlayerVocalClient) holder.getConnection()).getPlayer());
+		}
+		// Case when the connection corresponds to a stand-alone connection -> Needs to check if the player exist.
+		else {
+			optSource = getServer().getPlayers().get(request.getSource());
+			if (!optSource.isPresent())
+				return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_NOT_FOUND);
+		}
+
+		Optional<IVocalPlayer> optTarget = getServer().getPlayers().get(request.getTarget());
+		if (!optTarget.isPresent())
+			return answer(getVersion(), request, VocalErrorCode.PLAYER_NOT_FOUND);
+
+		optTarget.get().setMuteBy(optSource.get(), request.isMute());
+		if (optTarget.get().isMuteBy(optSource.get()) != request.isMute())
 			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
 
 		return answer(getVersion(), request, request.getProperties());

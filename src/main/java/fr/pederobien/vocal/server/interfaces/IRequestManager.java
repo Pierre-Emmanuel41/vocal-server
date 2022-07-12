@@ -69,4 +69,14 @@ public interface IRequestManager {
 	 * @return The message to send to the remote in order to update the mute status of a player.
 	 */
 	IVocalMessage onPlayerMuteChange(IVocalPlayer player);
+
+	/**
+	 * Creates a message in order to mute or unmute a target player for a source player.
+	 * 
+	 * @param target The target player to mute or unmute for a source player.
+	 * @param source The source player for which a target player is mute or unmute.
+	 * 
+	 * @return The message to send to the remote in order to update the muteby status of a player.
+	 */
+	IVocalMessage onPlayerMuteByChange(IVocalPlayer target, IVocalPlayer source);
 }
