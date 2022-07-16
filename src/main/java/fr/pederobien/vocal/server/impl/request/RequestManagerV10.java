@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import fr.pederobien.vocal.common.impl.VocalErrorCode;
 import fr.pederobien.vocal.common.impl.VocalIdentifier;
+import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerDeafenStatusV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerMuteByStatusV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerMuteStatusV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerNameV10;
@@ -36,6 +37,7 @@ public class RequestManagerV10 extends RequestManager {
 		getRequests().put(VocalIdentifier.SET_PLAYER_NAME, holder -> setPlayerName(holder));
 		getRequests().put(VocalIdentifier.SET_PLAYER_MUTE, holder -> setPlayerMute(holder));
 		getRequests().put(VocalIdentifier.SET_PLAYER_MUTE_BY, holder -> setPlayerMuteBy(holder));
+		getRequests().put(VocalIdentifier.SET_PLAYER_DEAFEN, holder -> setPlayerDeafen(holder));
 	}
 
 	@Override
@@ -82,6 +84,11 @@ public class RequestManagerV10 extends RequestManager {
 	@Override
 	public IVocalMessage onPlayerMuteByChange(IVocalPlayer target, IVocalPlayer source) {
 		return create(getVersion(), VocalIdentifier.SET_PLAYER_MUTE_BY, target.getName(), source.getName(), target.isMuteBy(source));
+	}
+
+	@Override
+	public IVocalMessage onPlayerDeafenChange(IVocalPlayer player) {
+		return create(getVersion(), VocalIdentifier.SET_PLAYER_DEAFEN, player.getName(), player.isDeafen());
 	}
 
 	/**
@@ -237,6 +244,41 @@ public class RequestManagerV10 extends RequestManager {
 
 		optTarget.get().setMuteBy(optSource.get(), request.isMute());
 		if (optTarget.get().isMuteBy(optSource.get()) != request.isMute())
+			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
+
+		return answer(getVersion(), request, request.getProperties());
+	}
+
+	/**
+	 * Set the deafen status of a player.
+	 * 
+	 * @param holder The holder that contains the connection that received the request and the request itself.
+	 * 
+	 * @return The server answer.
+	 */
+	private IVocalMessage setPlayerDeafen(RequestReceivedHolder holder) {
+		SetPlayerDeafenStatusV10 request = (SetPlayerDeafenStatusV10) holder.getRequest();
+		RunResult result = runIfInstanceof(holder, PlayerVocalClient.class, client -> client.getPlayer().getName().equals(request.getPlayerName()));
+		Optional<IVocalPlayer> optPlayer;
+
+		// Case when the connection corresponds to a player connection -> Needs to check player's name match.
+		if (result.getHasRun()) {
+			if (!result.getResult())
+				return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_DOES_NOT_MATCH);
+			else
+				optPlayer = Optional.of(((PlayerVocalClient) holder.getConnection()).getPlayer());
+		}
+		// Case when the connection corresponds to a stand-alone connection -> Needs to check if the player exist.
+		else {
+			optPlayer = getServer().getPlayers().get(request.getPlayerName());
+			if (!optPlayer.isPresent())
+				return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_NOT_FOUND);
+		}
+
+		VocalPlayer player = ((VocalPlayer) optPlayer.get());
+		player.setDeafen(request.isDeafen());
+
+		if (player.isDeafen() != request.isDeafen())
 			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
 
 		return answer(getVersion(), request, request.getProperties());

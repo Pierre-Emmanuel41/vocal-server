@@ -79,4 +79,13 @@ public interface IRequestManager {
 	 * @return The message to send to the remote in order to update the muteby status of a player.
 	 */
 	IVocalMessage onPlayerMuteByChange(IVocalPlayer target, IVocalPlayer source);
+
+	/**
+	 * Creates a message in order to update the player deafen status.
+	 * 
+	 * @param player The player whose the deafen status has changed.
+	 * 
+	 * @return The message to send to the remote in order to update the deafen status of a player.
+	 */
+	IVocalMessage onPlayerDeafenChange(IVocalPlayer player);
 }

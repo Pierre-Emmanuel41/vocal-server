@@ -54,13 +54,6 @@ public interface IVocalPlayer {
 	boolean isDeafen();
 
 	/**
-	 * Set the new deafen status of the player.
-	 * 
-	 * @param isDeafen True if the player is deafen, false otherwise.
-	 */
-	void setDeafen(boolean isDeafen);
-
-	/**
 	 * @return The address used for the TCP communication.
 	 */
 	InetSocketAddress getTcpAddress();

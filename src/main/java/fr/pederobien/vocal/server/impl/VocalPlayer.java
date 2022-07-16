@@ -109,21 +109,6 @@ public class VocalPlayer implements IVocalPlayer {
 	}
 
 	@Override
-	public void setDeafen(boolean isDeafen) {
-		lock.lock();
-		try {
-			if (this.isDeafen == isDeafen)
-				return;
-
-			boolean oldDeafen = this.isDeafen;
-			EventManager.callEvent(new VocalPlayerDeafenChangePreEvent(this, isDeafen), () -> this.isDeafen = isDeafen,
-					new VocalPlayerDeafenChangePostEvent(this, oldDeafen));
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	@Override
 	public InetSocketAddress getTcpAddress() {
 		return tcpConnection.getAddress();
 	}
@@ -145,14 +130,15 @@ public class VocalPlayer implements IVocalPlayer {
 				return;
 
 			String oldName = this.name;
-			EventManager.callEvent(new VocalPlayerNameChangePreEvent(this, name), () -> this.name = name, new VocalPlayerNameChangePostEvent(this, oldName));
+			Runnable update = () -> this.name = name;
+			EventManager.callEvent(new VocalPlayerNameChangePreEvent(this, name), update, new VocalPlayerNameChangePostEvent(this, oldName));
 		} finally {
 			lock.unlock();
 		}
 	}
 
 	/**
-	 * Set the new mute status of this player.
+	 * Set the new mute status of this player. For internal use only.
 	 * 
 	 * @param isMute True if the player is mute, false otherwise.
 	 */
@@ -165,6 +151,25 @@ public class VocalPlayer implements IVocalPlayer {
 			boolean oldMute = this.isMute;
 			Runnable update = () -> this.isMute = isMute;
 			EventManager.callEvent(new VocalPlayerMuteChangePreEvent(this, isMute), update, new VocalPlayerMuteChangePostEvent(this, oldMute));
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * Set the new deafen status of the player. For internal use only.
+	 * 
+	 * @param isDeafen True if the player is deafen, false otherwise.
+	 */
+	public void setDeafen(boolean isDeafen) {
+		lock.lock();
+		try {
+			if (this.isDeafen == isDeafen)
+				return;
+
+			boolean oldDeafen = this.isDeafen;
+			Runnable update = () -> this.isDeafen = isDeafen;
+			EventManager.callEvent(new VocalPlayerDeafenChangePreEvent(this, isDeafen), update, new VocalPlayerDeafenChangePostEvent(this, oldDeafen));
 		} finally {
 			lock.unlock();
 		}

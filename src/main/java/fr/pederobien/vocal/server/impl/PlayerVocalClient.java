@@ -13,6 +13,7 @@ import fr.pederobien.vocal.common.impl.VocalErrorCode;
 import fr.pederobien.vocal.common.impl.VocalIdentifier;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.event.VocalClientDisconnectPostEvent;
+import fr.pederobien.vocal.server.event.VocalPlayerDeafenChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerMuteByChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerMuteChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerNameChangePostEvent;
@@ -114,6 +115,14 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		doIfPlayerJoined(() -> send(getServer().getRequestManager().onPlayerMuteByChange(getVersion(), event.getPlayer(), event.getSource())));
 	}
 
+	@EventHandler(priority = EventPriority.HIGHEST)
+	private void onPlayerDeafenChange(VocalPlayerDeafenChangePostEvent event) {
+		if (!event.getPlayer().getServer().equals(getServer()))
+			return;
+
+		doIfPlayerJoined(() -> send(getServer().getRequestManager().onPlayerDeafenChange(getVersion(), event.getPlayer())));
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onUnexpectedDataReceived(UnexpectedDataReceivedEvent event) {
 		IVocalMessage request = checkReceivedRequest(event);
@@ -157,6 +166,7 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		case SET_PLAYER_NAME:
 		case SET_PLAYER_MUTE:
 		case SET_PLAYER_MUTE_BY:
+		case SET_PLAYER_DEAFEN:
 			return true;
 		default:
 			return false;
