@@ -5,6 +5,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 
 import fr.pederobien.vocal.common.impl.VocalErrorCode;
+import fr.pederobien.vocal.common.impl.VolumeResult;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.impl.RequestReceivedHolder;
 import fr.pederobien.vocal.server.impl.VocalServerMessageFactory;
@@ -84,6 +85,11 @@ public class ServerRequestManager implements IServerRequestManager {
 	@Override
 	public IVocalMessage onPlayerDeafenChange(float version, IVocalPlayer player) {
 		return findManagerAndApply(version, manager -> manager.onPlayerDeafenChange(player));
+	}
+
+	@Override
+	public IVocalMessage onPlayerSpeak(float version, IVocalPlayer transmitter, byte[] data, VolumeResult volume) {
+		return findManagerAndApply(version, manager -> manager.onPlayerSpeak(transmitter, data, volume));
 	}
 
 	private void register(IRequestManager manager) {

@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import fr.pederobien.communication.event.ConnectionLostEvent;
 import fr.pederobien.communication.event.UnexpectedDataReceivedEvent;
+import fr.pederobien.communication.interfaces.IConnection;
 import fr.pederobien.communication.interfaces.ITcpConnection;
 import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
@@ -24,7 +25,7 @@ import fr.pederobien.vocal.server.event.VocalServerPlayerRemovePostEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
-public class PlayerVocalClient extends AbstractVocalConnection implements IEventListener {
+public class PlayerVocalClient extends AbstractTcpVocalConnection implements IEventListener {
 	private IVocalPlayer player;
 	private AtomicBoolean isRegistered;
 	private AtomicBoolean isJoined;
@@ -68,8 +69,8 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 	}
 
 	@Override
-	protected void setTcpConnection(ITcpConnection connection) {
-		super.setTcpConnection(connection);
+	protected void setConnection(IConnection connection) {
+		super.setConnection((ITcpConnection) connection);
 
 		if (establishCommunicationProtocolVersion() && isRegistered.compareAndSet(false, true))
 			EventManager.registerListener(this);
@@ -138,18 +139,18 @@ public class PlayerVocalClient extends AbstractVocalConnection implements IEvent
 		}
 
 		if (checkPermission(request))
-			send(getServer().getRequestManager().answer(new RequestReceivedHolder(request, this)));
+			send(getServer().getRequestManager().answer(new RequestReceivedHolder(this, event, request)));
 		else
 			send(VocalServerMessageFactory.answer(request, VocalErrorCode.PERMISSION_REFUSED));
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void OnConnectionLostEvent(ConnectionLostEvent event) {
-		if (!event.getConnection().equals(getTcpConnection()))
+		if (!event.getConnection().equals(getConnection()))
 			return;
 
 		isJoined.set(false);
-		getTcpConnection().dispose();
+		getConnection().dispose();
 		EventManager.callEvent(new VocalClientDisconnectPostEvent(this));
 		EventManager.unregisterListener(this);
 	}

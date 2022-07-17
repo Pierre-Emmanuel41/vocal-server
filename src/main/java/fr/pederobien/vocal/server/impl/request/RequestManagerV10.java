@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.vocal.common.impl.VocalErrorCode;
 import fr.pederobien.vocal.common.impl.VocalIdentifier;
+import fr.pederobien.vocal.common.impl.VolumeResult;
+import fr.pederobien.vocal.common.impl.messages.v10.PlayerSpeakInfoMessageV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerDeafenStatusV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerMuteByStatusV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerMuteStatusV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetPlayerNameV10;
 import fr.pederobien.vocal.common.impl.messages.v10.SetServerJoinV10;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
+import fr.pederobien.vocal.server.event.VocalPlayerSpeakEvent;
 import fr.pederobien.vocal.server.impl.PlayerVocalClient;
 import fr.pederobien.vocal.server.impl.RequestReceivedHolder;
 import fr.pederobien.vocal.server.impl.VocalPlayer;
@@ -38,6 +42,9 @@ public class RequestManagerV10 extends RequestManager {
 		getRequests().put(VocalIdentifier.SET_PLAYER_MUTE, holder -> setPlayerMute(holder));
 		getRequests().put(VocalIdentifier.SET_PLAYER_MUTE_BY, holder -> setPlayerMuteBy(holder));
 		getRequests().put(VocalIdentifier.SET_PLAYER_DEAFEN, holder -> setPlayerDeafen(holder));
+
+		// Audio message
+		getRequests().put(VocalIdentifier.PLAYER_SPEAK_INFO, holder -> setPlayerSpeak(holder));
 	}
 
 	@Override
@@ -89,6 +96,11 @@ public class RequestManagerV10 extends RequestManager {
 	@Override
 	public IVocalMessage onPlayerDeafenChange(IVocalPlayer player) {
 		return create(getVersion(), VocalIdentifier.SET_PLAYER_DEAFEN, player.getName(), player.isDeafen());
+	}
+
+	@Override
+	public IVocalMessage onPlayerSpeak(IVocalPlayer transmitter, byte[] data, VolumeResult volume) {
+		return create(getVersion(), VocalIdentifier.PLAYER_SPEAK_SET, transmitter.getName(), data, volume);
 	}
 
 	/**
@@ -282,5 +294,25 @@ public class RequestManagerV10 extends RequestManager {
 			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
 
 		return answer(getVersion(), request, request.getProperties());
+	}
+
+	/**
+	 * Throw a PlayerSpeakEvent.
+	 * 
+	 * @param holder The holder that contains the connection that received the request and the request itself.
+	 * 
+	 * @return The server answer.
+	 */
+	private IVocalMessage setPlayerSpeak(RequestReceivedHolder holder) {
+		PlayerSpeakInfoMessageV10 request = (PlayerSpeakInfoMessageV10) holder.getRequest();
+
+		Optional<IVocalPlayer> optPlayer = getServer().getPlayers().get(request.getPlayerName());
+		if (!optPlayer.isPresent())
+			return null;
+
+		VocalPlayer player = (VocalPlayer) optPlayer.get();
+		player.setUdpAddress(holder.getEvent().getAddress());
+		EventManager.callEvent(new VocalPlayerSpeakEvent(getServer(), player, request.getData()));
+		return null;
 	}
 }

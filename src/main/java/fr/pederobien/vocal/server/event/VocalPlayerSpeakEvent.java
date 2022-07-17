@@ -33,8 +33,10 @@ public class VocalPlayerSpeakEvent extends ProjectVocalServerEvent {
 		this.players = new HashMap<String, IVocalPlayer>();
 		volumes = new HashMap<IVocalPlayer, VolumeResult>();
 
-		for (IVocalPlayer player : server.getPlayers().toList())
-			this.players.put(player.getName(), player);
+		server.getPlayers().forEach(receiver -> {
+			if (!receiver.isDeafen() && !transmitter.isMuteBy(receiver))
+				players.put(receiver.getName(), receiver);
+		});
 	}
 
 	/**

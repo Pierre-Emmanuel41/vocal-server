@@ -14,9 +14,9 @@ import fr.pederobien.vocal.server.interfaces.IServerRequestManager;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
 public class VocalServer implements IVocalServer, IEventListener {
-	private static final double EPSILON = Math.pow(10, -4);
 	private TcpServer tcpServer;
 	private UdpServer udpServer;
+	private VocalAudioConnection audioConnection;
 	private String name;
 	private AtomicBoolean isOpened;
 	private AtomicInteger port;
@@ -34,7 +34,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 		this.name = name;
 
 		this.port = new AtomicInteger(port);
-		tcpServer = new TcpServer(name, port, () -> new VocalMessageExtractor(), true);
+		tcpServer = new TcpServer(getName(), getPort(), () -> new VocalMessageExtractor(), true);
 		udpServer = new UdpServer(getName(), getPort(), () -> new VocalMessageExtractor());
 		isOpened = new AtomicBoolean(false);
 		players = new ServerPlayerList(this);
@@ -55,8 +55,9 @@ public class VocalServer implements IVocalServer, IEventListener {
 			return;
 
 		tcpServer.connect();
+		udpServer.connect();
+		audioConnection = new VocalAudioConnection(this, udpServer.getConnection());
 		clients.clear();
-		// udpServer.connect();
 	}
 
 	@Override
@@ -65,8 +66,8 @@ public class VocalServer implements IVocalServer, IEventListener {
 			return;
 
 		tcpServer.disconnect();
+		udpServer.disconnect();
 		EventManager.unregisterListener(clients);
-		// udpServer.disconnect();
 	}
 
 	@Override
@@ -96,36 +97,10 @@ public class VocalServer implements IVocalServer, IEventListener {
 		return tcpServer;
 	}
 
-	/*
-	 * @EventHandler private void onDataReceived(DataReceivedEvent event) { if
-	 * (!event.getConnection().equals(udpServer.getConnection())) return;
-	 * 
-	 * // Verification of the structure of the bytes array. IVocalMessage message =
-	 * VocalServerMessageFactory.parse(event.getBuffer()); if (message.getHeader().getIdentifier() !=
-	 * VocalIdentifier.PLAYER_SPEAK_INFO) return;
-	 * 
-	 * // Checking if the player is know by the server. PlayerSpeakInfoMessageV10 playerSpeakMessage = (PlayerSpeakInfoMessageV10)
-	 * message; Optional<IVocalPlayer> optPlayer = getPlayers().get(playerSpeakMessage.getPlayerName());
-	 * 
-	 * if (!optPlayer.isPresent()) return;
-	 * 
-	 * IVocalPlayer player = optPlayer.get();
-	 * 
-	 * // Dispatching the player speak event in order to specify to which person the transmitter speak VocalPlayerSpeakEvent
-	 * vocalPlayerSpeakEvent = new VocalPlayerSpeakEvent(this, player, playerSpeakMessage.getData());
-	 * EventManager.callEvent(vocalPlayerSpeakEvent);
-	 * 
-	 * // Sending the audio sample to the concerned players. IVocalPlayer transmitter = vocalPlayerSpeakEvent.getTransmitter(); byte[]
-	 * data = vocalPlayerSpeakEvent.getData(); vocalPlayerSpeakEvent.getVolumes().keySet().parallelStream().forEach(receiver -> {
-	 * 
-	 * // Checking if the receiver can accept audio sample from the transmitter if (!receiver.isOnline() || receiver.isDeafen() ||
-	 * transmitter.isMuteBy(receiver)) return;
-	 * 
-	 * // Checking volume before sending. VolumeResult volume = vocalPlayerSpeakEvent.getVolumes().get(receiver); if (volume == null
-	 * || volume.getGlobal() < EPSILON) return;
-	 * 
-	 * IVocalMessage response = VocalServerMessageFactory.create(VocalIdentifier.PLAYER_SPEAK_SET, transmitter.getName(), data,
-	 * volume); udpServer.getConnection().send(new AddressMessage(response.generate(), response.getHeader().getSequence(),
-	 * receiver.getAddress())); }); }
+	/**
+	 * @return The audio server the receive/send audio samples.
 	 */
+	protected VocalAudioConnection getAudioConnection() {
+		return audioConnection;
+	}
 }

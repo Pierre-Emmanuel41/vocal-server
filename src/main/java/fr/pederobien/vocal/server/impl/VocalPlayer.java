@@ -16,15 +16,13 @@ import fr.pederobien.vocal.server.event.VocalPlayerMuteChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerMuteChangePreEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerNameChangePostEvent;
 import fr.pederobien.vocal.server.event.VocalPlayerNameChangePreEvent;
-import fr.pederobien.vocal.server.event.VocalPlayerOnlineChangePostEvent;
-import fr.pederobien.vocal.server.event.VocalPlayerOnlineChangePreEvent;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
 public class VocalPlayer implements IVocalPlayer {
 	private IVocalServer server;
 	private String name;
-	private boolean isOnline, isMute, isDeafen;
+	private boolean isMute, isDeafen;
 	private Map<IVocalPlayer, Boolean> isMuteBy;
 	private ITcpConnection tcpConnection;
 	private InetSocketAddress udpAddress;
@@ -56,26 +54,6 @@ public class VocalPlayer implements IVocalPlayer {
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	public boolean isOnline() {
-		return isOnline;
-	}
-
-	@Override
-	public void setOnline(boolean isOnline) {
-		lock.lock();
-		try {
-			if (this.isOnline == isOnline)
-				return;
-
-			boolean oldOnline = this.isOnline;
-			EventManager.callEvent(new VocalPlayerOnlineChangePreEvent(this, isOnline), () -> this.isOnline = isOnline,
-					new VocalPlayerOnlineChangePostEvent(this, oldOnline));
-		} finally {
-			lock.unlock();
-		}
 	}
 
 	@Override
@@ -173,6 +151,15 @@ public class VocalPlayer implements IVocalPlayer {
 		} finally {
 			lock.unlock();
 		}
+	}
+
+	/**
+	 * Set the udp address associated to this this player. For internal use only.
+	 * 
+	 * @param udpAddress The address used to send/receive audio samples.
+	 */
+	public void setUdpAddress(InetSocketAddress udpAddress) {
+		this.udpAddress = udpAddress;
 	}
 
 	/**

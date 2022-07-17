@@ -15,18 +15,6 @@ public interface IVocalPlayer {
 	String getName();
 
 	/**
-	 * @return True if this player is connected to this server.
-	 */
-	boolean isOnline();
-
-	/**
-	 * Set the online status of a player.
-	 * 
-	 * @param isOnline The new player's online status.
-	 */
-	void setOnline(boolean isOnline);
-
-	/**
 	 * @return True if this player is mute, false otherwise.
 	 */
 	boolean isMute();

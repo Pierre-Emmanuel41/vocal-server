@@ -1,5 +1,6 @@
 package fr.pederobien.vocal.server.interfaces;
 
+import fr.pederobien.vocal.common.impl.VolumeResult;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.impl.RequestReceivedHolder;
 
@@ -88,4 +89,15 @@ public interface IRequestManager {
 	 * @return The message to send to the remote in order to update the deafen status of a player.
 	 */
 	IVocalMessage onPlayerDeafenChange(IVocalPlayer player);
+
+	/**
+	 * Creates a message in order to send an audio sample.
+	 * 
+	 * @param transmitter The speaking player.
+	 * @param data        The bytes array that represents an audio sample.
+	 * @param volume      The different sound volume of the sample.
+	 * 
+	 * @return The message to send to the remote in order to play an audio sample.
+	 */
+	IVocalMessage onPlayerSpeak(IVocalPlayer transmitter, byte[] data, VolumeResult volume);
 }

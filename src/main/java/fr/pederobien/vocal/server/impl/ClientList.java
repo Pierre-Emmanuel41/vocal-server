@@ -72,7 +72,7 @@ public class ClientList implements IEventListener {
 		try {
 			PlayerVocalClient client = new PlayerVocalClient(server, connection);
 			clients.add(client);
-			client.setTcpConnection(connection);
+			client.setConnection(connection);
 			EventManager.callEvent(new VocalServerClientAddPostEvent(server, client, connection.getAddress()));
 			return client;
 		} finally {
