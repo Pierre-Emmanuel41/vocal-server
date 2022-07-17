@@ -57,8 +57,38 @@ public class VocalPlayer implements IVocalPlayer {
 	}
 
 	@Override
+	public void setName(String name) {
+		lock.lock();
+		try {
+			if (this.name.equals(name))
+				return;
+
+			String oldName = this.name;
+			Runnable update = () -> this.name = name;
+			EventManager.callEvent(new VocalPlayerNameChangePreEvent(this, name), update, new VocalPlayerNameChangePostEvent(this, oldName));
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
 	public boolean isMute() {
 		return isMute;
+	}
+
+	@Override
+	public void setMute(boolean isMute) {
+		lock.lock();
+		try {
+			if (this.isMute == isMute)
+				return;
+
+			boolean oldMute = this.isMute;
+			Runnable update = () -> this.isMute = isMute;
+			EventManager.callEvent(new VocalPlayerMuteChangePreEvent(this, isMute), update, new VocalPlayerMuteChangePostEvent(this, oldMute));
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
@@ -87,58 +117,6 @@ public class VocalPlayer implements IVocalPlayer {
 	}
 
 	@Override
-	public InetSocketAddress getTcpAddress() {
-		return tcpConnection.getAddress();
-	}
-
-	@Override
-	public InetSocketAddress getUdpAddress() {
-		return udpAddress;
-	}
-
-	/**
-	 * Set the name of this player. For internal use only.
-	 * 
-	 * @param name The new player name.
-	 */
-	public void setName(String name) {
-		lock.lock();
-		try {
-			if (this.name.equals(name))
-				return;
-
-			String oldName = this.name;
-			Runnable update = () -> this.name = name;
-			EventManager.callEvent(new VocalPlayerNameChangePreEvent(this, name), update, new VocalPlayerNameChangePostEvent(this, oldName));
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Set the new mute status of this player. For internal use only.
-	 * 
-	 * @param isMute True if the player is mute, false otherwise.
-	 */
-	public void setMute(boolean isMute) {
-		lock.lock();
-		try {
-			if (this.isMute == isMute)
-				return;
-
-			boolean oldMute = this.isMute;
-			Runnable update = () -> this.isMute = isMute;
-			EventManager.callEvent(new VocalPlayerMuteChangePreEvent(this, isMute), update, new VocalPlayerMuteChangePostEvent(this, oldMute));
-		} finally {
-			lock.unlock();
-		}
-	}
-
-	/**
-	 * Set the new deafen status of the player. For internal use only.
-	 * 
-	 * @param isDeafen True if the player is deafen, false otherwise.
-	 */
 	public void setDeafen(boolean isDeafen) {
 		lock.lock();
 		try {
@@ -151,6 +129,16 @@ public class VocalPlayer implements IVocalPlayer {
 		} finally {
 			lock.unlock();
 		}
+	}
+
+	@Override
+	public InetSocketAddress getTcpAddress() {
+		return tcpConnection.getAddress();
+	}
+
+	@Override
+	public InetSocketAddress getUdpAddress() {
+		return udpAddress;
 	}
 
 	/**

@@ -15,9 +15,23 @@ public interface IVocalPlayer {
 	String getName();
 
 	/**
+	 * Set the name of this player.
+	 * 
+	 * @param name The new player name.
+	 */
+	public void setName(String name);
+
+	/**
 	 * @return True if this player is mute, false otherwise.
 	 */
 	boolean isMute();
+
+	/**
+	 * Set the new mute status of this player.
+	 * 
+	 * @param isMute True if the player is mute, false otherwise.
+	 */
+	public void setMute(boolean isMute);
 
 	/**
 	 * Indicates if this player is mute for the given player.
@@ -40,6 +54,13 @@ public interface IVocalPlayer {
 	 * @return True if this player is deafen, false otherwise.
 	 */
 	boolean isDeafen();
+
+	/**
+	 * Set the new deafen status of the player.
+	 * 
+	 * @param isDeafen True if the player is deafen, false otherwise.
+	 */
+	public void setDeafen(boolean isDeafen);
 
 	/**
 	 * @return The address used for the TCP communication.

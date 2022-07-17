@@ -179,10 +179,9 @@ public class RequestManagerV10 extends RequestManager {
 		if (optCheck.isPresent())
 			return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_ALREADY_EXISTS);
 
-		VocalPlayer player = ((VocalPlayer) optPlayer.get());
-		player.setName(request.getNewName());
+		optPlayer.get().setName(request.getNewName());
 
-		if (!player.getName().equals(request.getNewName()))
+		if (!optPlayer.get().getName().equals(request.getNewName()))
 			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
 
 		return answer(getVersion(), request, request.getProperties());
@@ -214,10 +213,9 @@ public class RequestManagerV10 extends RequestManager {
 				return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_NOT_FOUND);
 		}
 
-		VocalPlayer player = ((VocalPlayer) optPlayer.get());
-		player.setMute(request.isMute());
+		optPlayer.get().setMute(request.isMute());
 
-		if (player.isMute() != request.isMute())
+		if (optPlayer.get().isMute() != request.isMute())
 			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
 
 		return answer(getVersion(), request, request.getProperties());
@@ -287,10 +285,9 @@ public class RequestManagerV10 extends RequestManager {
 				return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_NOT_FOUND);
 		}
 
-		VocalPlayer player = ((VocalPlayer) optPlayer.get());
-		player.setDeafen(request.isDeafen());
+		optPlayer.get().setDeafen(request.isDeafen());
 
-		if (player.isDeafen() != request.isDeafen())
+		if (optPlayer.get().isDeafen() != request.isDeafen())
 			return answer(getVersion(), request, VocalErrorCode.REQUEST_CANCELLED);
 
 		return answer(getVersion(), request, request.getProperties());
