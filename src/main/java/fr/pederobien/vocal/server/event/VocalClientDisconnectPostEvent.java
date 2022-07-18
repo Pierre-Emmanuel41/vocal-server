@@ -1,5 +1,7 @@
 package fr.pederobien.vocal.server.event;
 
+import java.util.StringJoiner;
+
 import fr.pederobien.vocal.server.impl.PlayerVocalClient;
 
 public class VocalClientDisconnectPostEvent extends PlayerVocalClientEvent {
@@ -11,5 +13,13 @@ public class VocalClientDisconnectPostEvent extends PlayerVocalClientEvent {
 	 */
 	public VocalClientDisconnectPostEvent(PlayerVocalClient client) {
 		super(client);
+	}
+
+	@Override
+	public String toString() {
+		StringJoiner joiner = new StringJoiner(", ", "{", "}");
+		joiner.add("server=" + getClient().getServer().getName());
+		joiner.add("client=#%s" + getClient().hashCode());
+		return String.format("%s_%s", getName(), joiner);
 	}
 }
