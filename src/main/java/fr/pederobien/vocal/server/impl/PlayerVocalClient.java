@@ -135,6 +135,7 @@ public class PlayerVocalClient extends AbstractTcpVocalConnection implements IEv
 			isJoined.set(false);
 			EventManager.callEvent(new VocalServerClientLeavePostEvent(getServer(), this));
 			send(VocalServerMessageFactory.answer(request));
+			player = null;
 			return;
 		}
 

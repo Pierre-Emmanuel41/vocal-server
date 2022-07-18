@@ -110,7 +110,7 @@ public class ServerPlayerList implements IServerPlayerList, IEventListener {
 
 	@EventHandler
 	private void onClientDisconnect(VocalClientDisconnectPostEvent event) {
-		if (!event.getClient().getServer().equals(getServer()))
+		if (!event.getClient().getServer().equals(getServer()) || event.getClient().getPlayer() == null)
 			return;
 
 		removePlayer(event.getClient().getPlayer());

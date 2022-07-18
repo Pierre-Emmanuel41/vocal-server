@@ -35,7 +35,7 @@ public class VocalAudioConnection extends AbstractVocalConnection implements IEv
 	private void onPlayerSpeak(VocalPlayerSpeakEvent event) {
 		IVocalPlayer transmitter = event.getTransmitter();
 		byte[] data = event.getData();
-		event.getVolumes().keySet().parallelStream().forEach(receiver -> {
+		event.getVolumes().keySet().parallelStream().filter(receiver -> receiver.getUdpAddress() != null).forEach(receiver -> {
 
 			// Checking if the receiver can accept audio sample from the transmitter
 			if (receiver.isDeafen() || transmitter.isMuteBy(receiver))
@@ -67,7 +67,7 @@ public class VocalAudioConnection extends AbstractVocalConnection implements IEv
 	 * @param address The address to which the message should be sent.
 	 */
 	protected void send(IVocalMessage message, InetSocketAddress address) {
-		if (getConnection() == null || getConnection().isDisposed())
+		if (message == null || getConnection() == null || getConnection().isDisposed())
 			return;
 
 		((IUdpConnection) getConnection()).send(new VocalAddressMessage(message, address));

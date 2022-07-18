@@ -123,7 +123,7 @@ public class AbstractTcpVocalConnection extends AbstractVocalConnection {
 	 * @param timeout  The request timeout.
 	 */
 	protected void send(IVocalMessage message, Consumer<ResponseCallbackArgs> callback, int timeout) {
-		if (getConnection() == null || getConnection().isDisposed())
+		if (message == null || getConnection() == null || getConnection().isDisposed())
 			return;
 
 		((ITcpConnection) getConnection()).send(new VocalCallbackMessage(message, callback, timeout));
