@@ -19,7 +19,6 @@ import fr.pederobien.vocal.server.event.VocalPlayerSpeakEvent;
 import fr.pederobien.vocal.server.impl.PlayerVocalClient;
 import fr.pederobien.vocal.server.impl.RequestReceivedHolder;
 import fr.pederobien.vocal.server.impl.VocalPlayer;
-import fr.pederobien.vocal.server.impl.VocalServerMessageFactory;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
@@ -142,11 +141,16 @@ public class RequestManagerV10 extends RequestManager {
 	 */
 	private IVocalMessage setServerJoin(RequestReceivedHolder holder) {
 		SetServerJoinV10 request = (SetServerJoinV10) holder.getRequest();
+
+		Optional<IVocalPlayer> optPlayer = getServer().getPlayers().get(request.getPlayerName());
+		if (optPlayer.isPresent())
+			return answer(getVersion(), holder.getRequest(), VocalErrorCode.PLAYER_ALREADY_EXISTS);
+
 		RunResult result = runIfInstanceof(holder, PlayerVocalClient.class, client -> client.join(request.getPlayerName(), request.isMute(), request.isDeafen()));
 		if (result.getHasRun() && !result.getResult())
-			return VocalServerMessageFactory.answer(holder.getRequest(), VocalErrorCode.SERVER_ALREADY_JOINED);
+			return answer(getVersion(), holder.getRequest(), VocalErrorCode.SERVER_ALREADY_JOINED);
 
-		return VocalServerMessageFactory.answer(holder.getRequest());
+		return answer(getVersion(), holder.getRequest());
 	}
 
 	/**
