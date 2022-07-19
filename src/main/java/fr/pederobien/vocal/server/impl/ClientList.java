@@ -12,7 +12,9 @@ import fr.pederobien.utils.event.EventHandler;
 import fr.pederobien.utils.event.EventManager;
 import fr.pederobien.utils.event.EventPriority;
 import fr.pederobien.utils.event.IEventListener;
+import fr.pederobien.vocal.server.event.VocalClientDisconnectPostEvent;
 import fr.pederobien.vocal.server.event.VocalServerClientAddPostEvent;
+import fr.pederobien.vocal.server.event.VocalServerClientRemovePostEvent;
 
 public class ClientList implements IEventListener {
 	private VocalServer server;
@@ -67,6 +69,14 @@ public class ClientList implements IEventListener {
 		createClient(event.getConnection());
 	}
 
+	@EventHandler
+	private void onClientDisconnect(VocalClientDisconnectPostEvent event) {
+		if (!event.getClient().getServer().equals(server))
+			return;
+
+		removeClient(event.getClient());
+	}
+
 	private PlayerVocalClient createClient(ITcpConnection connection) {
 		lock.lock();
 		try {
@@ -78,5 +88,23 @@ public class ClientList implements IEventListener {
 		} finally {
 			lock.unlock();
 		}
+	}
+
+	/**
+	 * Thread safe operation to remove the given client from the registered clients list.
+	 * 
+	 * @param client The client to remove.
+	 */
+	private void removeClient(PlayerVocalClient client) {
+		lock.lock();
+		boolean removed = false;
+		try {
+			removed = clients.remove(client);
+		} finally {
+			lock.unlock();
+		}
+
+		if (removed)
+			EventManager.callEvent(new VocalServerClientRemovePostEvent(server, client));
 	}
 }
