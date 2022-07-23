@@ -14,6 +14,7 @@ public class VocalPlayerSpeakEvent extends ProjectVocalServerEvent {
 	private Map<String, IVocalPlayer> players;
 	private Map<IVocalPlayer, VolumeResult> volumes;
 	private byte[] data;
+	private boolean isMono, isEncoded;
 
 	/**
 	 * Creates an event thrown when a player is speaking. The list of players contains a copy of registered players on the server.
@@ -24,11 +25,15 @@ public class VocalPlayerSpeakEvent extends ProjectVocalServerEvent {
 	 * @param server      The server involved in this event.
 	 * @param transmitter The speaking player.
 	 * @param data        The bytes array that represents an audio sample.
+	 * @param isMono      True if the audio signal is a mono signal, false otherwise.
+	 * @param isEncoded   True if the audio sample has been encoded, false otherwise.
 	 */
-	public VocalPlayerSpeakEvent(IVocalServer server, IVocalPlayer transmitter, byte[] data) {
+	public VocalPlayerSpeakEvent(IVocalServer server, IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded) {
 		this.server = server;
 		this.transmitter = transmitter;
 		this.data = data;
+		this.isMono = isMono;
+		this.isEncoded = isEncoded;
 
 		this.players = new HashMap<String, IVocalPlayer>();
 		volumes = new HashMap<IVocalPlayer, VolumeResult>();
@@ -74,9 +79,25 @@ public class VocalPlayerSpeakEvent extends ProjectVocalServerEvent {
 		return data;
 	}
 
+	/**
+	 * @return True if the audio signal is a mono signal, false otherwise.
+	 */
+	public boolean isMono() {
+		return isMono;
+	}
+
+	/**
+	 * @return True if the audio sample has been encoded, false otherwise.
+	 */
+	public boolean isEncoded() {
+		return isEncoded;
+	}
+
 	@Override
 	public String toString() {
 		StringJoiner joiner = new StringJoiner(", ", "{", "}");
+		joiner.add("isMono=" + isMono());
+		joiner.add("isEncoded=" + isEncoded());
 		joiner.add("Transmitter=" + getTransmitter().getName());
 		StringJoiner receivers = new StringJoiner(", ", "{", "}");
 		String format = "name=%s, volume={global=%s, left=%s, right=%s}";

@@ -35,6 +35,8 @@ public class VocalAudioConnection extends AbstractVocalConnection implements IEv
 	private void onPlayerSpeak(VocalPlayerSpeakEvent event) {
 		IVocalPlayer transmitter = event.getTransmitter();
 		byte[] data = event.getData();
+		boolean isMono = event.isMono();
+		boolean isEncoded = event.isEncoded();
 		event.getVolumes().keySet().parallelStream().filter(receiver -> receiver.getUdpAddress() != null).forEach(receiver -> {
 
 			// Checking if the receiver can accept audio sample from the transmitter
@@ -46,7 +48,7 @@ public class VocalAudioConnection extends AbstractVocalConnection implements IEv
 			if (volume == null || volume.getGlobal() < EPSILON)
 				return;
 
-			send(getServer().getRequestManager().onPlayerSpeak(getVersion(), transmitter, data, volume), receiver.getUdpAddress());
+			send(getServer().getRequestManager().onPlayerSpeak(getVersion(), transmitter, data, isMono, isEncoded, volume), receiver.getUdpAddress());
 		});
 	}
 

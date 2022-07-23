@@ -113,9 +113,11 @@ public interface IServerRequestManager {
 	 * @param version     The protocol version to use to create a vocal message.
 	 * @param transmitter The speaking player.
 	 * @param data        The bytes array that represents an audio sample.
+	 * @param isMono      True if the audio signal is a mono signal, false otherwise.
+	 * @param isEncoded   True if the audio sample has been encoded, false otherwise.
 	 * @param volume      The different sound volume of the sample.
 	 * 
 	 * @return The message to send to the remote in order to play an audio sample.
 	 */
-	IVocalMessage onPlayerSpeak(float version, IVocalPlayer transmitter, byte[] data, VolumeResult volume);
+	IVocalMessage onPlayerSpeak(float version, IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume);
 }

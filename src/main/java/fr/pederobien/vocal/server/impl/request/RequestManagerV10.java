@@ -98,8 +98,8 @@ public class RequestManagerV10 extends RequestManager {
 	}
 
 	@Override
-	public IVocalMessage onPlayerSpeak(IVocalPlayer transmitter, byte[] data, VolumeResult volume) {
-		return create(getVersion(), VocalIdentifier.PLAYER_SPEAK_SET, transmitter.getName(), data, volume);
+	public IVocalMessage onPlayerSpeak(IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume) {
+		return create(getVersion(), VocalIdentifier.PLAYER_SPEAK_SET, transmitter.getName(), data, isMono, isEncoded, volume);
 	}
 
 	/**
@@ -313,7 +313,7 @@ public class RequestManagerV10 extends RequestManager {
 
 		VocalPlayer player = (VocalPlayer) optPlayer.get();
 		player.setUdpAddress(holder.getEvent().getAddress());
-		EventManager.callEvent(new VocalPlayerSpeakEvent(getServer(), player, request.getData()));
+		EventManager.callEvent(new VocalPlayerSpeakEvent(getServer(), player, request.getData(), request.isMono(), request.isEncoded()));
 		return null;
 	}
 }

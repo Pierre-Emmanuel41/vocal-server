@@ -88,8 +88,8 @@ public class ServerRequestManager implements IServerRequestManager {
 	}
 
 	@Override
-	public IVocalMessage onPlayerSpeak(float version, IVocalPlayer transmitter, byte[] data, VolumeResult volume) {
-		return findManagerAndApply(version, manager -> manager.onPlayerSpeak(transmitter, data, volume));
+	public IVocalMessage onPlayerSpeak(float version, IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume) {
+		return findManagerAndApply(version, manager -> manager.onPlayerSpeak(transmitter, data, isMono, isEncoded, volume));
 	}
 
 	private void register(IRequestManager manager) {
