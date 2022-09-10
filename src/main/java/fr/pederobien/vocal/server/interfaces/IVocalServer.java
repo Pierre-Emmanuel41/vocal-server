@@ -1,11 +1,18 @@
 package fr.pederobien.vocal.server.interfaces;
 
+import fr.pederobien.vocal.server.impl.SpeakBehavior;
+
 public interface IVocalServer {
 
 	/**
 	 * @return The name of this server.
 	 */
 	String getName();
+
+	/**
+	 * @return The default server behavior when a player is speaking.
+	 */
+	SpeakBehavior getSpeakBehavior();
 
 	/**
 	 * Open this server in order to accept players.

@@ -23,14 +23,16 @@ public class VocalServer implements IVocalServer, IEventListener {
 	private IServerPlayerList players;
 	private IServerRequestManager serverRequestManager;
 	private ClientList clients;
+	private SpeakBehavior speakBehavior;
 
 	/**
 	 * Creates a server for vocal communication between several players.
 	 * 
-	 * @param name The server name.
-	 * @param port The server port number for the UDP and TCP communication.
+	 * @param name          The server name.
+	 * @param port          The server port number for the UDP and TCP communication.
+	 * @param speakBehavior the default server behavior when a player is speaking.
 	 */
-	public VocalServer(String name, int port) {
+	public VocalServer(String name, int port, SpeakBehavior speakBehavior) {
 		this.name = name;
 
 		this.port = new AtomicInteger(port);
@@ -47,6 +49,11 @@ public class VocalServer implements IVocalServer, IEventListener {
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public SpeakBehavior getSpeakBehavior() {
+		return speakBehavior;
 	}
 
 	@Override

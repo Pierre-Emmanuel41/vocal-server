@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import fr.pederobien.vocal.common.impl.VolumeResult;
+import fr.pederobien.vocal.server.impl.SpeakBehavior;
 import fr.pederobien.vocal.server.interfaces.IVocalPlayer;
 import fr.pederobien.vocal.server.interfaces.IVocalServer;
 
@@ -38,10 +39,14 @@ public class VocalPlayerSpeakEvent extends ProjectVocalServerEvent {
 		this.players = new HashMap<String, IVocalPlayer>();
 		volumes = new HashMap<IVocalPlayer, VolumeResult>();
 
-		server.getPlayers().forEach(receiver -> {
-			if (!receiver.isDeafen() && !transmitter.isMuteBy(receiver))
-				players.put(receiver.getName(), receiver);
-		});
+		server.getPlayers().stream().filter(receiver -> !receiver.isDeafen() && !transmitter.isMuteBy(receiver))
+				.forEach(receiver -> players.put(receiver.getName(), receiver));
+
+		if (server.getSpeakBehavior() != SpeakBehavior.TO_EVERYONE)
+			return;
+
+		server.getPlayers().stream().filter(receiver -> !receiver.equals(transmitter) && !receiver.isDeafen() && !transmitter.isMuteBy(receiver))
+				.forEach(receiver -> volumes.put(receiver, new VolumeResult(1.0)));
 	}
 
 	/**
