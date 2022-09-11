@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Stream;
 
 import fr.pederobien.communication.interfaces.ITcpConnection;
 import fr.pederobien.utils.event.EventManager;
@@ -109,6 +110,11 @@ public class VocalPlayer implements IVocalPlayer {
 		} finally {
 			lock.unlock();
 		}
+	}
+
+	@Override
+	public Stream<IVocalPlayer> getMuteByPlayers() {
+		return isMuteBy.entrySet().stream().filter(entry -> entry.getValue()).map(entry -> entry.getKey());
 	}
 
 	@Override

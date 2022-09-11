@@ -1,6 +1,7 @@
 package fr.pederobien.vocal.server.interfaces;
 
 import java.net.InetSocketAddress;
+import java.util.stream.Stream;
 
 public interface IVocalPlayer {
 
@@ -49,6 +50,11 @@ public interface IVocalPlayer {
 	 * @param isMute True if this player is mute for the other player, false otherwise.
 	 */
 	void setMuteBy(IVocalPlayer player, boolean isMute);
+
+	/**
+	 * @return A stream that contains players for which this player is mute.
+	 */
+	Stream<IVocalPlayer> getMuteByPlayers();
 
 	/**
 	 * @return True if this player is deafen, false otherwise.
