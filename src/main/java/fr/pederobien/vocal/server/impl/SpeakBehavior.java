@@ -20,16 +20,25 @@ public enum SpeakBehavior {
 	public static final List<String> NAMES = Arrays.asList(TO_EVERYONE.getName(), TO_NO_ONE.getName());
 
 	private String name;
+	private String friendlyName;
 
 	private SpeakBehavior(String name) {
 		this.name = name;
+		this.friendlyName = name.replace('_', ' ');
 	}
 
 	/**
-	 * @return The user friendly name of this enumeration field.
+	 * @return The name of this enumeration field.
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return The user friendly name of this field
+	 */
+	public String getFriendlyName() {
+		return friendlyName;
 	}
 
 	/**
