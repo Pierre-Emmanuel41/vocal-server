@@ -34,6 +34,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 	 */
 	public VocalServer(String name, int port, SpeakBehavior speakBehavior) {
 		this.name = name;
+		this.speakBehavior = speakBehavior;
 
 		this.port = new AtomicInteger(port);
 		tcpServer = new TcpServer(getName(), getPort(), () -> new VocalMessageExtractor(), true);
