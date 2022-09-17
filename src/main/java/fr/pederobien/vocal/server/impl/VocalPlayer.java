@@ -148,7 +148,16 @@ public class VocalPlayer implements IVocalPlayer {
 	}
 
 	/**
-	 * Set the udp address associated to this this player. For internal use only.
+	 * Set the TCP connection associated to this this player. For internal use only.
+	 * 
+	 * @param tcpConnection The connection used to send/receive server configuration updates.
+	 */
+	public void setTcpConnection(ITcpConnection tcpConnection) {
+		this.tcpConnection = tcpConnection;
+	}
+
+	/**
+	 * Set the UDP address associated to this this player. For internal use only.
 	 * 
 	 * @param udpAddress The address used to send/receive audio samples.
 	 */

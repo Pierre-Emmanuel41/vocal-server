@@ -64,6 +64,7 @@ public class PlayerVocalClient extends AbstractTcpVocalConnection implements IEv
 			return false;
 
 		player = new VocalPlayer(getServer(), name, isMute, isDeafen);
+		((VocalPlayer) player).setTcpConnection((ITcpConnection) getConnection());
 		EventManager.callEvent(new VocalServerClientJoinPostEvent(getServer(), this));
 		return true;
 	}
