@@ -1,6 +1,8 @@
 package fr.pederobien.vocal.server.impl;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 import fr.pederobien.communication.event.DataReceivedEvent;
 import fr.pederobien.communication.interfaces.IUdpConnection;
@@ -37,6 +39,8 @@ public class VocalAudioConnection extends AbstractVocalConnection implements IEv
 		byte[] data = event.getData();
 		boolean isMono = event.isMono();
 		boolean isEncoded = event.isEncoded();
+		Map<IVocalPlayer, VolumeResult> volumes = new HashMap<IVocalPlayer, VolumeResult>();
+
 		event.getVolumes().keySet().parallelStream().filter(receiver -> receiver.getUdpAddress() != null).forEach(receiver -> {
 
 			// Checking if the receiver can accept audio sample from the transmitter
@@ -48,8 +52,11 @@ public class VocalAudioConnection extends AbstractVocalConnection implements IEv
 			if (volume == null || volume.getGlobal() < EPSILON)
 				return;
 
+			volumes.put(receiver, volume);
 			send(getServer().getRequestManager().onPlayerSpeak(getVersion(), transmitter, data, isMono, isEncoded, volume), receiver.getUdpAddress());
 		});
+		event.getVolumes().clear();
+		event.getVolumes().putAll(volumes);
 	}
 
 	@EventHandler(priority = EventPriority.LOWEST)
