@@ -63,7 +63,14 @@ public class PlayerVocalClient extends AbstractTcpVocalConnection implements IEv
 		if (!isJoined.compareAndSet(false, true))
 			return false;
 
-		player = new VocalPlayer(getServer(), name, isMute, isDeafen);
+		if (player == null)
+			player = new VocalPlayer(getServer(), name, isMute, isDeafen);
+		else {
+			player.setName(name);
+			player.setMute(isMute);
+			player.setDeafen(isDeafen);
+		}
+
 		((VocalPlayer) player).setTcpConnection((ITcpConnection) getConnection());
 		EventManager.callEvent(new VocalServerClientJoinPostEvent(getServer(), this));
 		return true;
@@ -136,7 +143,6 @@ public class PlayerVocalClient extends AbstractTcpVocalConnection implements IEv
 			isJoined.set(false);
 			EventManager.callEvent(new VocalServerClientLeavePostEvent(getServer(), this));
 			send(VocalServerMessageFactory.answer(request));
-			player = null;
 			return;
 		}
 
