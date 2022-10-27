@@ -1,5 +1,6 @@
 package fr.pederobien.vocal.server.impl;
 
+import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import fr.pederobien.communication.event.ConnectionLostEvent;
@@ -74,6 +75,15 @@ public class PlayerVocalClient extends AbstractTcpVocalConnection implements IEv
 		((VocalPlayer) player).setTcpConnection((ITcpConnection) getConnection());
 		EventManager.callEvent(new VocalServerClientJoinPostEvent(getServer(), this));
 		return true;
+	}
+
+	/**
+	 * Sends a request to the client, if the player has joined the server, in order to time-synchronize with the server.
+	 * 
+	 * @param time The actual time on the server.
+	 */
+	public void synchronize(LocalTime time) {
+		doIfPlayerJoined(() -> send(getServer().getRequestManager().onTimeSynchronization(getVersion(), time)));
 	}
 
 	@Override

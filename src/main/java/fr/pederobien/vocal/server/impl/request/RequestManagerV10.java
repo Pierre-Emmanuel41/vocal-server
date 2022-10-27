@@ -1,5 +1,6 @@
 package fr.pederobien.vocal.server.impl.request;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -57,6 +58,11 @@ public class RequestManagerV10 extends RequestManager {
 	}
 
 	@Override
+	public IVocalMessage onTimeSynchronization(LocalTime time) {
+		return create(getVersion(), VocalIdentifier.SERVER_TIME_SYNCHRO, time);
+	}
+
+	@Override
 	public IVocalMessage onServerPlayerAdd(IVocalPlayer player) {
 		List<Object> properties = new ArrayList<Object>();
 
@@ -98,8 +104,8 @@ public class RequestManagerV10 extends RequestManager {
 	}
 
 	@Override
-	public IVocalMessage onPlayerSpeak(IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume) {
-		return create(getVersion(), VocalIdentifier.PLAYER_SPEAK_SET, transmitter.getName(), data, isMono, isEncoded, volume);
+	public IVocalMessage onPlayerSpeak(LocalTime time, IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume) {
+		return create(getVersion(), VocalIdentifier.PLAYER_SPEAK_SET, time, transmitter.getName(), data, isMono, isEncoded, volume);
 	}
 
 	/**

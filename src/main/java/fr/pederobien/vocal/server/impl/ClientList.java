@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Stream;
 
 import fr.pederobien.communication.event.NewTcpClientEvent;
 import fr.pederobien.communication.interfaces.ITcpConnection;
@@ -36,6 +37,25 @@ public class ClientList implements IEventListener {
 	}
 
 	/**
+	 * @return A copy of the the underlying list that stores clients.
+	 */
+	public List<PlayerVocalClient> toList() {
+		lock.lock();
+		try {
+			return new ArrayList<PlayerVocalClient>(clients);
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	/**
+	 * @return a sequential {@code Stream} over the elements in this collection.
+	 */
+	public Stream<PlayerVocalClient> stream() {
+		return toList().stream();
+	}
+
+	/**
 	 * Get the client associated to the given name.
 	 * 
 	 * @param name The player name.
@@ -43,10 +63,15 @@ public class ClientList implements IEventListener {
 	 * @return An optional that contains the client associated to the specified name if registered, an empty optional otherwise.
 	 */
 	public Optional<PlayerVocalClient> get(String name) {
-		for (PlayerVocalClient client : clients)
-			if (client.getPlayer() != null && client.getPlayer().getName().equals(name))
-				return Optional.of(client);
-		return Optional.empty();
+		lock.lock();
+		try {
+			for (PlayerVocalClient client : clients)
+				if (client.getPlayer() != null && client.getPlayer().getName().equals(name))
+					return Optional.of(client);
+			return Optional.empty();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	/**

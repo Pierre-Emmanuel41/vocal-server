@@ -1,5 +1,6 @@
 package fr.pederobien.vocal.server.impl.request;
 
+import java.time.LocalTime;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -58,6 +59,11 @@ public class ServerRequestManager implements IServerRequestManager {
 	}
 
 	@Override
+	public IVocalMessage onTimeSynchronization(float version, LocalTime time) {
+		return findManagerAndApply(version, manager -> manager.onTimeSynchronization(time));
+	}
+
+	@Override
 	public IVocalMessage onServerPlayerAdd(float version, IVocalPlayer player) {
 		return findManagerAndApply(version, manager -> manager.onServerPlayerAdd(player));
 	}
@@ -88,8 +94,8 @@ public class ServerRequestManager implements IServerRequestManager {
 	}
 
 	@Override
-	public IVocalMessage onPlayerSpeak(float version, IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume) {
-		return findManagerAndApply(version, manager -> manager.onPlayerSpeak(transmitter, data, isMono, isEncoded, volume));
+	public IVocalMessage onPlayerSpeak(float version, LocalTime time, IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume) {
+		return findManagerAndApply(version, manager -> manager.onPlayerSpeak(time, transmitter, data, isMono, isEncoded, volume));
 	}
 
 	private void register(IRequestManager manager) {

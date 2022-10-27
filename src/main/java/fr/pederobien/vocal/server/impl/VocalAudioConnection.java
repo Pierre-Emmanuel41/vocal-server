@@ -1,6 +1,7 @@
 package fr.pederobien.vocal.server.impl;
 
 import java.net.InetSocketAddress;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class VocalAudioConnection extends AbstractVocalConnection implements IEv
 				return;
 
 			volumes.put(receiver, volume);
-			send(getServer().getRequestManager().onPlayerSpeak(getVersion(), transmitter, data, isMono, isEncoded, volume), receiver.getUdpAddress());
+			send(getServer().getRequestManager().onPlayerSpeak(getVersion(), LocalTime.now(), transmitter, data, isMono, isEncoded, volume), receiver.getUdpAddress());
 		});
 		event.getVolumes().clear();
 		event.getVolumes().putAll(volumes);

@@ -1,5 +1,7 @@
 package fr.pederobien.vocal.server.interfaces;
 
+import java.time.LocalTime;
+
 import fr.pederobien.vocal.common.impl.VolumeResult;
 import fr.pederobien.vocal.common.interfaces.IVocalMessage;
 import fr.pederobien.vocal.server.impl.RequestReceivedHolder;
@@ -44,6 +46,16 @@ public interface IServerRequestManager {
 	 * @return The message to send to the remote in order to get the latest version of the communication protocol.
 	 */
 	IVocalMessage setCommunicationProtocolVersion(float version);
+
+	/**
+	 * Creates a message in order to time-synchronize a client with the server.
+	 * 
+	 * @param version The version of the communication protocol to use.
+	 * @param time    The actual time on the server.
+	 * 
+	 * @return The message to send to the remote in order to time-synchronize with the server.
+	 */
+	IVocalMessage onTimeSynchronization(float version, LocalTime time);
 
 	/**
 	 * Creates a message in order to register a new player.
@@ -111,6 +123,7 @@ public interface IServerRequestManager {
 	 * Creates a message in order to send an audio sample.
 	 * 
 	 * @param version     The protocol version to use to create a vocal message.
+	 * @param time        the time at which this message is sent to the client.
 	 * @param transmitter The speaking player.
 	 * @param data        The bytes array that represents an audio sample.
 	 * @param isMono      True if the audio signal is a mono signal, false otherwise.
@@ -119,5 +132,5 @@ public interface IServerRequestManager {
 	 * 
 	 * @return The message to send to the remote in order to play an audio sample.
 	 */
-	IVocalMessage onPlayerSpeak(float version, IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume);
+	IVocalMessage onPlayerSpeak(float version, LocalTime time, IVocalPlayer transmitter, byte[] data, boolean isMono, boolean isEncoded, VolumeResult volume);
 }

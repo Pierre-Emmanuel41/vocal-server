@@ -24,6 +24,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 	private IServerRequestManager serverRequestManager;
 	private ClientList clients;
 	private SpeakBehavior speakBehavior;
+	private TimeSynchroThread timeSynchroThread;
 
 	/**
 	 * Creates a server for vocal communication between several players.
@@ -43,6 +44,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 		players = new ServerPlayerList(this);
 		serverRequestManager = new ServerRequestManager(this);
 		clients = new ClientList(this);
+		timeSynchroThread = new TimeSynchroThread(clients);
 
 		EventManager.registerListener(this);
 	}
@@ -66,6 +68,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 		udpServer.connect();
 		audioConnection = new VocalAudioConnection(this, udpServer.getConnection());
 		clients.clear();
+		timeSynchroThread.start();
 	}
 
 	@Override
@@ -75,6 +78,7 @@ public class VocalServer implements IVocalServer, IEventListener {
 
 		tcpServer.disconnect();
 		udpServer.disconnect();
+		timeSynchroThread.interrupt();
 		EventManager.unregisterListener(clients);
 	}
 
